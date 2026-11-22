@@ -200,4 +200,22 @@ Errors use RFC 9457 `ProblemDetail` responses.
   `.env` is git-ignored.
 - `dev`: local PostgreSQL from Docker Compose, manual ingestion endpoint enabled.
 - `test`: PostgreSQL from Testcontainers, scheduler disabled.
-- Companies and their sources are configured in `backend/src/main/resources/companies.yml`.
+- Companies and their sources are configured in `backend/src/main/resources/companies.yml`
+  (see below). The `test` profile disables the startup sync; tests synchronize what they need.
+
+## Company catalog
+
+`companies.yml` is bound to `CompanyCatalogProperties` (records, Bean Validation: slug format,
+https website, at least one source, source type and identifier required). Invalid entries stop the
+application at startup.
+
+`CompanyCatalogSynchronizer` runs once at startup and makes the database match the file:
+
+- companies are matched by `slug`, sources by `(source_type, identifier)`;
+- new entries are created, changed names, websites and regions are updated;
+- entries missing from the file are **deactivated, never deleted**, so their postings and ingestion
+  history remain; they are reactivated if they come back;
+- duplicate slugs or sources in the file, and moving a source to another company, are rejected.
+
+The sync is idempotent and logs what it changed. Every identifier in the file is verified against
+the live public API, and entries added before the curated list exists are marked `example: true`.

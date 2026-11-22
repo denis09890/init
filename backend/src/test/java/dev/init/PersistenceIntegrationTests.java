@@ -26,10 +26,7 @@ import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,9 +36,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * Runs the Flyway migrations on a real PostgreSQL and checks that the JPA mapping, constraints,
  * array and JSONB columns and full-text search behave as intended. Each test rolls back.
  */
-@SpringBootTest
-@Import(TestcontainersConfiguration.class)
-@ActiveProfiles("test")
+@IntegrationTest
 @Transactional
 class PersistenceIntegrationTests {
 

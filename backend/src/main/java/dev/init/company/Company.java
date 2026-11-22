@@ -50,6 +50,29 @@ public class Company {
 		this.updatedAt = this.createdAt;
 	}
 
+	/** @return {@code true} if anything changed */
+	public boolean updateDetails(String name, String website) {
+		Objects.requireNonNull(name, "name");
+		boolean changed = !name.equals(this.name) || !Objects.equals(website, this.website);
+		this.name = name;
+		this.website = website;
+		return changed;
+	}
+
+	/** @return {@code true} if the company was inactive */
+	public boolean activate() {
+		boolean changed = !active;
+		this.active = true;
+		return changed;
+	}
+
+	/** @return {@code true} if the company was active */
+	public boolean deactivate() {
+		boolean changed = active;
+		this.active = false;
+		return changed;
+	}
+
 	@PreUpdate
 	void onUpdate() {
 		this.updatedAt = Instant.now();

@@ -125,6 +125,11 @@ npm run dev
 
 On macOS or Linux use `cp` and `./mvnw` instead.
 
+**Troubleshooting:** `password authentication failed for user "init"` usually means a PostgreSQL
+installed directly on your machine already listens on port 5432, so the backend reaches it instead of
+the container. Set `DB_PORT=5433` in `.env`, then recreate the container with
+`docker compose down -v` and `docker compose up -d`.
+
 ## Running tests
 
 ```powershell
