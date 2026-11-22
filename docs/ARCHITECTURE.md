@@ -76,12 +76,34 @@ Adding a new ATS means adding one class:
 ```java
 public interface JobSourceConnector {
     SourceType type();
-    List<RawJob> fetch(CompanySource source);
+    List<RawJob> fetch(SourceTarget target);   // all published postings, raw
+    NormalizedJob normalize(RawJob job);       // raw payload -> common shape
 }
 ```
 
-`RawJob` carries the external id, the raw JSON payload and the source URL. Normalization to the common
-model is a separate step, so stored raw payloads can be re-processed after the normalizer improves.
+- `SourceTarget` (type, identifier, region) keeps connectors independent of JPA entities.
+- `RawJob` is the external id plus the posting's JSON exactly as received; it is what
+  `raw_postings` stores. Because `normalize` only needs that payload, stored postings can be
+  normalized again after the normalizer improves, without fetching.
+- `NormalizedJob` is the common shape: title, URL, location strings as written by the source,
+  country code, workplace type, full plain-text description (used for classification and the
+  snippet, never published), posting date, department, employment type and experience level.
+- `SourceConnectors` looks connectors up by `SourceType`.
+
+| Connector | Endpoint | Notes |
+|---|---|---|
+| Greenhouse | `boards-api.greenhouse.io/v1/boards/{token}/jobs?content=true` | One response, no paging. Description is entity-escaped HTML. Several locations in one string, separated by `;`. |
+| Lever | `api.lever.co/v0/postings/{site}?mode=json` (EU: `api.eu.lever.co`) | Paged with `skip`/`limit`. `workplaceType` documented as `on-site`, returned as `onsite`; both accepted. |
+| SmartRecruiters | `api.smartrecruiters.com/v1/companies/{id}/postings?country=ro` | Paged with `offset`/`limit` (max 100) until `totalFound`. The list has no description, so each posting's details are fetched and stored as the raw payload. |
+| JSON-LD | the career page URL | robots.txt checked first. Reads `<script type="application/ld+json">` blocks, including `@graph`; skips broken blocks; does not follow links. |
+
+All HTTP goes through `SourceHttpClient` (JDK `HttpClient` behind Spring `RestClient`), which sets the
+`InitBot` User-Agent and timeouts (`init.http.*`) and turns failures into `SourceFetchException`
+with the HTTP status and whether a retry makes sense (I/O errors, 429, 5xx). Rate limiting and
+retries are added in the ingestion step.
+
+Connector tests run against recorded API responses in `src/test/resources/fixtures/`, trimmed to a
+few postings with descriptions replaced, so the repository never republishes job descriptions.
 
 ### Change detection
 
@@ -105,9 +127,11 @@ model is a separate step, so stored raw payloads can be re-processed after the n
 
 ### HTML sources
 
-The JSON-LD connector checks `robots.txt` before fetching a page, identifies itself as
-`InitBot/0.1 (+https://github.com/denis09890/init)`, and extracts
+The JSON-LD connector checks `robots.txt` before fetching a page (RFC 9309: our own `InitBot` group,
+else `*`; longest match wins; `*` and `$` supported; a missing robots.txt allows everything),
+identifies itself as `InitBot/0.1 (+https://github.com/denis09890/init)`, and extracts
 `<script type="application/ld+json">` blocks with jsoup, keeping objects of type `JobPosting`.
+Postings without an identifier or URL get a stable id derived from their title and date.
 
 ## Classification
 

@@ -10,6 +10,7 @@ import dev.init.classification.OpportunityType;
 import dev.init.classification.Seniority;
 import dev.init.company.Company;
 import dev.init.company.CompanySource;
+import dev.init.source.RemoteType;
 import dev.init.source.SourceType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

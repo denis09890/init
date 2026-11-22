@@ -1,0 +1,55 @@
+[
+  {
+    "additional": "",
+    "additionalPlain": "",
+    "categories": {
+      "commitment": "Regular Full Time (Salary)",
+      "department": "Customer Success",
+      "location": "Atlanta, Georgia",
+      "team": "Customer Success Team",
+      "allLocations": ["Atlanta, Georgia"]
+    },
+    "createdAt": 1788199939703,
+    "descriptionPlain": "Description shortened for the test fixture.\n",
+    "description": "<div>Description shortened for the test fixture.</div>",
+    "id": "ad208490-4052-4f91-a57e-433f2d1e484b",
+    "lists": [
+      { "text": "Skill Set:", "content": "<li>Clear written communication</li><li>Customer empathy</li>" }
+    ],
+    "text": "Customer Success Manager",
+    "country": "US",
+    "workplaceType": "hybrid",
+    "opening": "",
+    "openingPlain": "",
+    "descriptionBody": "<div>Description shortened for the test fixture.</div>",
+    "descriptionBodyPlain": "Description shortened for the test fixture.\n",
+    "hostedUrl": "https://jobs.lever.co/leverdemo/ad208490-4052-4f91-a57e-433f2d1e484b",
+    "applyUrl": "https://jobs.lever.co/leverdemo/ad208490-4052-4f91-a57e-433f2d1e484b/apply",
+    "salaryRange": { "min": 85000, "max": 175000, "currency": "USD", "interval": "per-year-salary" }
+  },
+  {
+    "additional": "<div>Closing text shortened.</div>",
+    "additionalPlain": "Closing text shortened.",
+    "categories": {
+      "commitment": "Regular Full Time (Salary)",
+      "department": "People (HR)",
+      "location": "Houston, TX",
+      "team": "People",
+      "allLocations": ["Houston, TX"]
+    },
+    "createdAt": 1787600587936,
+    "descriptionPlain": "Description shortened for the test fixture.",
+    "description": "<div>Description shortened for the test fixture.</div>",
+    "id": "120b5976-ee4e-4dc5-b31b-2b1ca124460c",
+    "lists": [],
+    "text": "Dentist",
+    "country": "US",
+    "workplaceType": "onsite",
+    "opening": "",
+    "openingPlain": "",
+    "descriptionBody": "<div>Description shortened for the test fixture.</div>",
+    "descriptionBodyPlain": "Description shortened for the test fixture.",
+    "hostedUrl": "https://jobs.lever.co/leverdemo/120b5976-ee4e-4dc5-b31b-2b1ca124460c",
+    "applyUrl": "https://jobs.lever.co/leverdemo/120b5976-ee4e-4dc5-b31b-2b1ca124460c/apply"
+  }
+]

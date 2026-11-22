@@ -1,0 +1,73 @@
+{
+  "offset": 0,
+  "limit": 100,
+  "totalFound": 2,
+  "content": [
+    {
+      "id": "744000162663639",
+      "name": "Working Student Claims Management ",
+      "uuid": "66a408a1-fbd3-49dd-ada0-82f751954df7",
+      "jobAdId": "ee28c529-f190-4dbe-9a0c-d531780b1121",
+      "defaultJobAd": true,
+      "refNumber": "REF301481V",
+      "company": { "identifier": "BoschGroup", "name": "Bosch Group" },
+      "releasedDate": "2026-11-20T06:49:50.059Z",
+      "location": {
+        "city": "Blaj",
+        "region": "Alba",
+        "country": "ro",
+        "address": "Strada Aurel Vlaicu nr. 2",
+        "postalCode": "515400",
+        "remote": false,
+        "hybrid": true,
+        "fullLocation": "Blaj, Alba, Romania"
+      },
+      "industry": { "id": "automotive", "label": "Automotive" },
+      "department": {},
+      "function": { "id": "administrative", "label": "Administrative" },
+      "typeOfEmployment": { "id": "intern", "label": "Intern" },
+      "experienceLevel": { "id": "internship", "label": "Internship" },
+      "customField": [
+        {
+          "fieldId": "5abe2a4ab60a5e486a2d9b1d",
+          "fieldLabel": "Contract type",
+          "valueId": "98487475-2a49-44f5-a615-408b525b3821",
+          "valueLabel": "Limited"
+        }
+      ],
+      "ref": "https://api.smartrecruiters.com/v1/companies/BoschGroup/postings/744000162663639",
+      "language": { "code": "en", "label": "English", "labelNative": "English (US)" },
+      "visibility": "PUBLIC"
+    },
+    {
+      "id": "744000162664020",
+      "name": "Scholarship in AI for PhD Students",
+      "uuid": "ddcab418-a3c7-4bf6-b646-e8b80f2f589b",
+      "jobAdId": "6a03d5d4-a88a-4529-8c10-69366f8d150a",
+      "defaultJobAd": true,
+      "refNumber": "REF301205T",
+      "company": { "identifier": "BoschGroup", "name": "Bosch Group" },
+      "releasedDate": "2026-11-20T07:09:09.207Z",
+      "location": {
+        "city": "Cluj-Napoca",
+        "region": "CJ",
+        "country": "ro",
+        "address": "Strada Constanța",
+        "remote": false,
+        "hybrid": true,
+        "latitude": "46.7752666",
+        "longitude": "23.5945931",
+        "fullLocation": "Cluj-Napoca, CJ, Romania"
+      },
+      "industry": { "id": "automotive", "label": "Automotive" },
+      "department": {},
+      "function": { "id": "project_management", "label": "Project Management" },
+      "typeOfEmployment": { "id": "permanent", "label": "Full-time" },
+      "experienceLevel": { "id": "internship", "label": "Internship" },
+      "customField": [],
+      "ref": "https://api.smartrecruiters.com/v1/companies/BoschGroup/postings/744000162664020",
+      "language": { "code": "en", "label": "English", "labelNative": "English (US)" },
+      "visibility": "PUBLIC"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Careers at Example Labs</title>
+  <!-- Not a job posting: must be ignored -->
+  <script type="application/ld+json">
+    { "@context": "https://schema.org", "@type": "Organization", "name": "Example Labs", "url": "https://careers.example.com" }
+  </script>
+  <!-- A single posting with a PropertyValue identifier and a structured address -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org/",
+      "@type": "JobPosting",
+      "title": "Junior Data Analyst",
+      "description": "<p>Description shortened for the test fixture.</p><ul><li>SQL</li><li>Python</li></ul>",
+      "identifier": { "@type": "PropertyValue", "name": "Example Labs", "value": "DA-2026-07" },
+      "datePosted": "2026-11-02",
+      "validThrough": "2026-12-31T23:59",
+      "employmentType": ["FULL_TIME", "INTERN"],
+      "hiringOrganization": { "@type": "Organization", "name": "Example Labs", "sameAs": "https://www.example.com" },
+      "jobLocation": {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Strada Exemplu 1",
+          "addressLocality": "Cluj-Napoca",
+          "addressRegion": "CJ",
+          "postalCode": "400000",
+          "addressCountry": "RO"
+        }
+      },
+      "url": "https://careers.example.com/jobs/junior-data-analyst"
+    }
+  </script>
+  <!-- A @graph with a remote posting that has neither identifier nor url -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        { "@type": "WebPage", "name": "Careers" },
+        {
+          "@type": ["JobPosting"],
+          "title": "Marketing Intern",
+          "description": "Plain text description.",
+          "datePosted": "2026-10-15T08:00:00+03:00",
+          "employmentType": "INTERN",
+          "jobLocationType": "TELECOMMUTE",
+          "applicantLocationRequirements": { "@type": "Country", "name": "Romania" }
+        }
+      ]
+    }
+  </script>
+  <!-- Broken JSON must not hide the valid blocks -->
+  <script type="application/ld+json">{ "@type": "JobPosting", "title": </script>
+</head>
+<body>
+  <h1>Careers at Example Labs</h1>
+</body>
+</html>
