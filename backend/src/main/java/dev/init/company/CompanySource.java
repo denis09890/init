@@ -63,6 +63,28 @@ public class CompanySource {
 		this.createdAt = Instant.now();
 	}
 
+	/** @return {@code true} if the region changed */
+	public boolean updateRegion(SourceRegion region) {
+		Objects.requireNonNull(region, "region");
+		boolean changed = region != this.region;
+		this.region = region;
+		return changed;
+	}
+
+	/** @return {@code true} if the source was inactive */
+	public boolean activate() {
+		boolean changed = !active;
+		this.active = true;
+		return changed;
+	}
+
+	/** @return {@code true} if the source was active */
+	public boolean deactivate() {
+		boolean changed = active;
+		this.active = false;
+		return changed;
+	}
+
 	public Long getId() {
 		return id;
 	}

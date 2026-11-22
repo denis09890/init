@@ -3,6 +3,9 @@
 spring:
   application:
     name: init
+  config:
+    # The company catalog (init.catalog.*).
+    import: classpath:companies.yml
   threads:
     virtual:
       enabled: true

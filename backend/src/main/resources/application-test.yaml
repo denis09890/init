@@ -1,5 +1,10 @@
 # Automated tests. The datasource is provided by Testcontainers through @ServiceConnection,
 # so no database settings are needed here.
+init:
+  catalog:
+    # Tests start from an empty database and synchronize the catalogs they need explicitly.
+    sync-on-startup: false
+
 logging:
   level:
     org.testcontainers: WARN

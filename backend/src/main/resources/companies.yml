@@ -1,0 +1,40 @@
+# Company catalog: the companies Init follows and the public sources their postings come from.
+# Synchronized into the database at startup: new entries are added, changed ones updated, and
+# entries removed from this file are deactivated (never deleted, so posting history is kept).
+#
+# Rules (see docs/adr/0002-data-sources-and-legal-stance.md):
+# - Every identifier must be verified against the live public API before it is added.
+# - Never guess board tokens or company ids.
+# - `example: true` marks entries added as verified examples, pending the owner's curated list.
+#
+# Source fields: type (GREENHOUSE | LEVER | SMARTRECRUITERS | JSON_LD), identifier (board token,
+# company id or career page URL), region (GLOBAL | EU, default GLOBAL; Lever only).
+init:
+  catalog:
+    companies:
+      # Verified 2026-11-22: GET https://boards-api.greenhouse.io/v1/boards/scbitdefendersrl/jobs
+      - name: Bitdefender
+        slug: bitdefender
+        website: https://www.bitdefender.com
+        example: true
+        sources:
+          - type: GREENHOUSE
+            identifier: scbitdefendersrl
+
+      # Verified 2026-11-22: GET https://boards-api.greenhouse.io/v1/boards/cresta/jobs
+      - name: Cresta
+        slug: cresta
+        website: https://cresta.com
+        example: true
+        sources:
+          - type: GREENHOUSE
+            identifier: cresta
+
+      # Verified 2026-11-22: GET https://api.smartrecruiters.com/v1/companies/BoschGroup/postings?country=ro
+      - name: Bosch
+        slug: bosch
+        website: https://www.bosch.com
+        example: true
+        sources:
+          - type: SMARTRECRUITERS
+            identifier: BoschGroup
