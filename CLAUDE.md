@@ -87,11 +87,16 @@ Current: **Milestone 1** (see `docs/ROADMAP.md` for the step checklist).
 - [x] Docs skeleton
 - [x] Scaffold: Spring Boot 4.2.0 (starters: webmvc, data-jpa, flyway, validation, actuator;
       Testcontainers 2.x), React 19 + Vite 8 + TypeScript 6 + ESLint 10
-- [ ] Step 2 + 2b (branch `chore/infrastructure`): Docker Compose, profiles, `.env.example`,
-      GitHub Actions CI (`.github/workflows/ci.yml`: backend `./mvnw -B verify` on JDK 21,
-      frontend `npm ci` + lint + build on Node 24) — written, waiting for the first CI run on the PR
-- [ ] Owner: Docker Desktop installed but blocked by a pending Windows update (WSL features are
-      pended until "Update and restart").
+- [x] Step 2 + 2b: Docker Compose, profiles, `.env.example`, GitHub Actions CI
+      (`.github/workflows/ci.yml`: backend `./mvnw -B verify` on JDK 21, frontend `npm ci` + lint +
+      build on Node 24). Merged, CI green.
+- [ ] Step 3 (branch `feat/data-model`): Flyway `V1__create_core_schema.sql`, JPA entities and
+      repositories, `PersistenceIntegrationTests`.
+- Owner environment: Docker Desktop installed in `A:\Docker\app` (data in `A:\Docker\data`), does
+  not auto-start; WSL2 works after the Windows update. C: has little free space, keep big data on A:.
+
+Before giving git commands, check the actual repo state by reading `.git/HEAD`, `.git/logs/HEAD` and
+`.git/refs/` (current branch, existing branches, whether a pull/merge already happened). Never assume.
 
 Configuration conventions: env vars `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USERNAME`, `DB_PASSWORD`;
 the dev profile imports the repo-root `.env`; PostgreSQL image `postgres:18-alpine` in both

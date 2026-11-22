@@ -138,8 +138,8 @@ erDiagram
 **companies**: `id`, `name`, `slug` (unique), `website`, `active`, `created_at`, `updated_at`.
 
 **company_sources**: `id`, `company_id`, `source_type` (`GREENHOUSE`, `LEVER`, `SMARTRECRUITERS`,
-`JSON_LD`), `identifier` (board token, company id or page URL), `active`, `created_at`.
-Unique on `(source_type, identifier)`.
+`JSON_LD`), `identifier` (board token, company id or page URL), `region` (`GLOBAL`, `EU`: Lever serves
+EU customers from a separate API host), `active`, `created_at`. Unique on `(source_type, identifier)`.
 
 **raw_postings**: `id`, `company_source_id`, `external_id`, `payload` (`jsonb`), `payload_hash`,
 `fetched_at`. Unique on `(company_source_id, external_id, payload_hash)`, so an unchanged payload is
@@ -160,12 +160,20 @@ stored once, not on every run.
 | `content_hash` | hash of the normalized fields, drives UPDATED detection |
 | `is_early_career` | the public API filters on this by default |
 | `opportunity_type` | `INTERNSHIP`, `WORKING_STUDENT`, `GRADUATE_PROGRAM`, `JUNIOR`, `OTHER` |
-| `domain`, `seniority`, `language` | from the classifier |
+| `domain` | `SOFTWARE`, `DATA`, `ENGINEERING`, `DESIGN`, `PRODUCT`, `FINANCE`, `MARKETING`, `SALES`, `HR`, `LEGAL`, `OPERATIONS`, `CUSTOMER_SUPPORT`, `RESEARCH`, `OTHER` |
+| `seniority` | `INTERN`, `ENTRY`, `JUNIOR`, `MID`, `SENIOR`, `LEAD`, `UNKNOWN` |
+| `language` | ISO 639-1 code of the posting text (`en`, `ro`), nullable |
 | `paid` | nullable: unknown is different from unpaid |
 | `search_vector` | generated `tsvector` over title and snippet, GIN index |
 
 Full-text search uses the `simple` text-search configuration, because postings are a mix of English and
-Romanian and a language-specific stemmer would mangle the other language.
+Romanian and a language-specific stemmer would mangle the other language. Known limitation: `simple`
+neither stems nor removes diacritics, so `practica` does not match `practică`. The search API will
+normalize queries; a diacritic-insensitive index (`unaccent`) is a Milestone 2 candidate.
+
+Hashes (`payload_hash`, `content_hash`) are hex-encoded SHA-256 stored as `varchar(64)`. Timestamps
+are `timestamptz`, mapped to `java.time.Instant`. Classification enums are owned by the
+`classification` module, `SourceType` and `SourceRegion` by the `source` module.
 
 **ingestion_runs**: `id`, `company_source_id`, `source_type`, `started_at`, `finished_at`, `status`
 (`RUNNING`, `SUCCEEDED`, `FAILED`), `fetched_count`, `new_count`, `updated_count`, `closed_count`,

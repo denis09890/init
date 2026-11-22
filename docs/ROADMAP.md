@@ -7,7 +7,7 @@
 - [x] 2. Infrastructure: Docker Compose with PostgreSQL, Spring profiles (`dev`, `test`),
       environment-based configuration, `.env.example`, root `.gitignore`
 - [x] 2b. GitHub Actions CI for backend and frontend (moved early so every pull request is checked)
-- [ ] 3. Flyway migrations and JPA mapping for the data model
+- [x] 3. Flyway migrations and JPA mapping for the data model
 - [ ] 4. Company and source configuration from YAML, upserted at startup, with verified example companies
 - [ ] 5. Connectors with unit tests on recorded fixtures
   - [ ] Connector contract and shared HTTP client
