@@ -19,7 +19,7 @@ import dev.init.ingestion.RawPostingRepository;
 import dev.init.posting.Posting;
 import dev.init.posting.PostingRepository;
 import dev.init.posting.PostingStatus;
-import dev.init.posting.RemoteType;
+import dev.init.source.RemoteType;
 import dev.init.source.SourceRegion;
 import dev.init.source.SourceType;
 import jakarta.persistence.EntityManager;

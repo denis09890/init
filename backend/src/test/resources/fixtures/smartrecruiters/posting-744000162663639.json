@@ -1,0 +1,64 @@
+{
+  "id": "744000162663639",
+  "name": "Working Student Claims Management ",
+  "uuid": "66a408a1-fbd3-49dd-ada0-82f751954df7",
+  "jobId": "17bd8c07-470b-4705-90b4-c6d69cba36db",
+  "jobAdId": "ee28c529-f190-4dbe-9a0c-d531780b1121",
+  "defaultJobAd": true,
+  "refNumber": "REF301481V",
+  "company": { "name": "Bosch Group", "identifier": "BoschGroup" },
+  "location": {
+    "city": "Blaj",
+    "region": "Alba",
+    "country": "ro",
+    "address": "Strada Aurel Vlaicu nr. 2",
+    "postalCode": "515400",
+    "remote": false,
+    "hybrid": true,
+    "fullLocation": "Blaj, Alba, Romania"
+  },
+  "customField": [
+    {
+      "fieldId": "5abe2a4ab60a5e486a2d9b1d",
+      "fieldLabel": "Position type",
+      "valueId": "6f3d8f0e-0000-4000-8000-000000000001",
+      "valueLabel": "Working student"
+    }
+  ],
+  "releasedDate": "2026-11-20T06:49:50.059Z",
+  "creator": { "name": "", "avatarUrl": "" },
+  "postingUrl": "https://jobs.smartrecruiters.com/BoschGroup/744000162663639-working-student-claims-management-",
+  "applyUrl": "https://jobs.smartrecruiters.com/BoschGroup/744000162663639-working-student-claims-management-?oga=true",
+  "referralUrl": "https://jobs.smartrecruiters.com/external-referrals/company/BoschGroup/publication/66a408a1-fbd3-49dd-ada0-82f751954df7?dcr_ci=BoschGroup",
+  "jobAd": {
+    "sections": {
+      "companyDescription": {
+        "title": "Company Description",
+        "text": "<p><strong>Company text shortened for the test fixture.</strong></p>"
+      },
+      "jobDescription": {
+        "title": "Job Description",
+        "text": "<ul><li>Processing of complaints on site.</li><li>Description shortened for the test fixture.</li></ul>"
+      },
+      "qualifications": {
+        "title": "Qualifications",
+        "text": "<ul><li>Bachelor/Master degree ongoing in technical studies;</li></ul>"
+      },
+      "additionalInformation": {
+        "title": "Additional Information",
+        "text": "<p><strong>Benefits:&#xa0;&#xa0;</strong></p><ul><li>Meal vouchers</li></ul>"
+      },
+      "videos": {
+        "title": "Videos To Watch",
+        "urls": ["https://www.youtube.com/watch?v=yOZDMKdgff8"]
+      }
+    }
+  },
+  "active": true,
+  "visibility": "PUBLIC",
+  "industry": { "id": "automotive", "label": "Automotive" },
+  "function": { "id": "administrative", "label": "Administrative" },
+  "experienceLevel": { "id": "internship", "label": "Internship" },
+  "typeOfEmployment": { "id": "intern", "label": "Intern" },
+  "language": { "code": "en", "label": "English", "labelNative": "English (US)" }
+}

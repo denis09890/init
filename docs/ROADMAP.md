@@ -9,12 +9,12 @@
 - [x] 2b. GitHub Actions CI for backend and frontend (moved early so every pull request is checked)
 - [x] 3. Flyway migrations and JPA mapping for the data model
 - [x] 4. Company and source configuration from YAML, upserted at startup, with verified example companies
-- [ ] 5. Connectors with unit tests on recorded fixtures
-  - [ ] Connector contract and shared HTTP client
-  - [ ] Greenhouse
-  - [ ] Lever
-  - [ ] SmartRecruiters
-  - [ ] Generic schema.org JSON-LD (with `robots.txt` support)
+- [x] 5. Connectors with unit tests on recorded fixtures
+  - [x] Connector contract and shared HTTP client
+  - [x] Greenhouse
+  - [x] Lever
+  - [x] SmartRecruiters
+  - [x] Generic schema.org JSON-LD (with `robots.txt` support)
 - [ ] 6. Rule-based classifier with English and Romanian test cases
 - [ ] 7. Ingestion pipeline with Testcontainers integration tests
   - [ ] Raw storage, normalization, upsert, NEW / UPDATED / CLOSED detection
