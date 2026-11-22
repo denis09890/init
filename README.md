@@ -1,3 +1,160 @@
 # Init
 
-Early-career opportunities in Romania, aggregated. Init your career.
+> **Init your career.** Early-career opportunities in Romania, aggregated in one place.
+
+![Status](https://img.shields.io/badge/status-Milestone%201%20in%20progress-yellow)
+
+Init collects internships, summer practice, working-student roles, graduate and trainee programs and
+junior positions from public company sources, classifies them, and makes them searchable in a single feed.
+It covers **all fields** (IT, engineering, finance, marketing, HR, legal and more) for students and
+graduates with 0–2 years of experience.
+
+---
+
+## The problem
+
+Early-career opportunities in Romania are scattered across dozens of company career sites, and on
+general job boards they get lost among senior roles. Students often find out about an internship
+after the application deadline has passed.
+
+Init fixes this by pulling postings directly from the companies' public sources, keeping only the
+early-career ones, and tracking when they open and close.
+
+## Features
+
+Implemented in Milestone 1 (in progress):
+
+- Automated ingestion from public ATS job-board APIs (Greenhouse, Lever, SmartRecruiters) and from
+  schema.org `JobPosting` structured data on career pages
+- Detection of new, updated and closed postings, with a full history of every ingestion run
+- Rule-based early-career classification in English and Romanian (opportunity type, domain, location)
+- Search API with filters, pagination and full-text search
+- Web UI: postings feed with filters and a detail view linking to the original posting
+
+Planned (see the [roadmap](docs/ROADMAP.md)):
+
+- LLM-assisted classification with a labeled evaluation set
+- User profiles with an explained match score ("80% match: you have Java and SQL; missing Docker")
+- Saved searches with email and Telegram alerts
+- Deadline calendar, application tracker, company history pages, public market insights
+
+## Architecture
+
+Init is a **modular monolith**: one Spring Boot application with clearly separated feature modules
+([ADR 0001](docs/adr/0001-modular-monolith.md)).
+
+```mermaid
+flowchart LR
+    subgraph Sources["Public sources"]
+        GH[Greenhouse API]
+        LV[Lever API]
+        SR[SmartRecruiters API]
+        LD[Career pages<br/>schema.org JSON-LD]
+    end
+
+    subgraph Backend["Spring Boot backend"]
+        ING[Ingestion<br/>scheduler, rate limiting, retries]
+        RAW[(raw_postings<br/>JSONB)]
+        NORM[Normalize + upsert<br/>NEW / UPDATED / CLOSED]
+        CLS[Classifier<br/>rule-based]
+        API[REST API]
+    end
+
+    DB[(PostgreSQL)]
+    FE[React frontend]
+
+    GH & LV & SR & LD --> ING
+    ING --> RAW --> NORM --> CLS --> DB
+    DB --> API --> FE
+```
+
+More detail in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+## Data sources and legal stance
+
+Init only uses sources that are **intended to be consumed publicly**
+([ADR 0002](docs/adr/0002-data-sources-and-legal-stance.md)):
+
+1. **Public job-board APIs** of applicant tracking systems, configured per company.
+2. **schema.org `JobPosting` structured data** that companies embed in their own career pages.
+3. **Manual submissions**, reviewed by an admin (later milestone).
+
+Ground rules:
+
+- No scraping of LinkedIn, eJobs, BestJobs or any site whose terms forbid automated access.
+- `robots.txt` is respected, and the crawler identifies itself with a clear User-Agent.
+- Only a short snippet (max ~300 characters) and a link to the original posting are shown publicly.
+  Full descriptions are never republished.
+- No personal data of recruiters is stored.
+
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| Backend | Java 21, Spring Boot, Maven wrapper |
+| Persistence | PostgreSQL, Flyway, Spring Data JPA |
+| HTTP and concurrency | Spring `RestClient`, virtual threads |
+| Parsing | jsoup (JSON-LD extraction from HTML) |
+| Testing | JUnit 5, AssertJ, Mockito, Testcontainers |
+| Frontend | React, TypeScript, Vite, React Router, Tailwind CSS |
+| Infrastructure | Docker Compose, GitHub Actions |
+
+## Running locally
+
+> These instructions are being built up during Milestone 1 and will be verified on a fresh clone
+> before the milestone is closed.
+
+**Prerequisites:** JDK 21 or newer, Node.js 20.19+ (or 22.12+), Docker Desktop.
+
+```powershell
+# 1. Configuration
+Copy-Item .env.example .env
+
+# 2. Database
+docker compose up -d
+
+# 3. Backend (http://localhost:8080)
+cd backend
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=dev"
+
+# 4. Frontend (http://localhost:5173), in a second terminal
+cd frontend
+npm install
+npm run dev
+```
+
+On macOS or Linux use `cp` and `./mvnw` instead.
+
+## Running tests
+
+```powershell
+# Backend: unit and integration tests (Docker must be running for Testcontainers)
+cd backend
+.\mvnw.cmd verify
+
+# Frontend: lint and production build
+cd frontend
+npm run lint
+npm run build
+```
+
+## Roadmap
+
+| Milestone | Scope | Status |
+|---|---|---|
+| 1. Foundation | Ingestion pipeline, connectors, rule-based classifier, search API, minimal UI, CI | In progress |
+| 2. Intelligence | LLM classification, evaluation set, cross-source deduplication, skills extraction | Planned |
+| 3. Users | Accounts, profiles, match score, alerts, application tracker, cloud deploy | Planned |
+| 4. Growth | Telegram bot, company pages, market insights, manual submissions, more connectors | Planned |
+
+Full breakdown in [docs/ROADMAP.md](docs/ROADMAP.md).
+
+## Screenshots
+
+_Coming with the first version of the frontend._
+
+## Documentation
+
+- [Architecture](docs/ARCHITECTURE.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Architecture decision records](docs/adr/)
