@@ -1,0 +1,15 @@
+# Local development against the PostgreSQL container from docker-compose.yml.
+# Values are read from the repo-root .env when present (whether the app is started from the
+# backend folder or the repo root); otherwise the defaults below match docker-compose.yml.
+spring:
+  config:
+    import:
+      - optional:file:./.env[.properties]
+      - optional:file:../.env[.properties]
+  datasource:
+    password: ${DB_PASSWORD:init}
+
+management:
+  endpoint:
+    health:
+      show-details: always

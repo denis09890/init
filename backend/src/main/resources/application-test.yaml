@@ -1,0 +1,6 @@
+# Automated tests. The datasource is provided by Testcontainers through @ServiceConnection,
+# so no database settings are needed here.
+logging:
+  level:
+    org.testcontainers: WARN
+    tc: WARN
