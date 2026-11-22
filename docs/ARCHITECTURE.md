@@ -45,7 +45,8 @@ All code lives under `dev.init`, packaged by feature.
 
 Dependency rules:
 
-- `source` and `classification` depend only on `common`. They do not know about the database.
+- `source` depends only on `common`; `classification` only on `common` and the value types of
+  `source` (`NormalizedJob`, `RemoteType`). Neither knows about the database.
 - `ingestion` orchestrates `company`, `source`, `classification` and `posting`.
 - Nothing depends on `ingestion`.
 - Controllers expose records (DTOs), never JPA entities.
@@ -135,14 +136,29 @@ Postings without an identifier or URL get a stable id derived from their title a
 
 ## Classification
 
-`PostingClassifier` takes a normalized job and returns a `Classification`: early-career flag,
-opportunity type, domain, seniority, language, and whether the location is relevant (Romania, or
-remote open to Romania/EU).
+`PostingClassifier` takes a `NormalizedJob` and returns a `Classification`: early-career flag,
+opportunity type, domain, seniority, location eligibility (Romania, or remote open to Romania/EU),
+language, paid (true/false/unknown) and the list of **reasons** (which rules fired), used for
+debugging now and to explain results to users later.
 
 Milestone 1 uses keyword rules in English and Romanian with explicit exclusions
-([ADR 0003](adr/0003-rule-based-classification-first.md)). Every posting is stored; the public API
-returns only early-career ones by default. Milestone 2 adds an LLM-based implementation behind the
-same interface, with the rules as fallback.
+([ADR 0003](adr/0003-rule-based-classification-first.md)), implemented in `RuleBasedClassifier`
+with the vocabulary in `ClassificationKeywords`:
+
+1. **Opportunity type** from the title, then the employment-type / experience-level fields, then
+   explicit phrases in the description. First match wins, in the order internship, working student,
+   graduate program, junior.
+2. **Exclusions** override it: senior or leadership titles, management titles unless the title itself
+   says junior/trainee, and descriptions asking for 3+ years of experience. Internship,
+   working-student and graduate titles are never excluded.
+3. **Domain** by keyword score: title 3 points, department 2; the description only when both are silent.
+4. **Location**: country `RO`, a Romanian place, or remote open to Europe; unknown locations are kept.
+
+Matching ignores case and diacritics and compares whole words, so `practica` matches `Practică` and
+`intern` does not match `internal`.
+
+Every posting is stored; the public API returns only early-career ones by default. Milestone 2 adds
+an LLM-based implementation behind the same interface, with the rules as fallback.
 
 ## Data model
 

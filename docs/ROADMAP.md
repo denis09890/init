@@ -15,7 +15,7 @@
   - [x] Lever
   - [x] SmartRecruiters
   - [x] Generic schema.org JSON-LD (with `robots.txt` support)
-- [ ] 6. Rule-based classifier with English and Romanian test cases
+- [x] 6. Rule-based classifier with English and Romanian test cases
 - [ ] 7. Ingestion pipeline with Testcontainers integration tests
   - [ ] Raw storage, normalization, upsert, NEW / UPDATED / CLOSED detection
   - [ ] Ingestion runs and per-source error isolation
