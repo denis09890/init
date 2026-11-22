@@ -12,7 +12,14 @@ quality, tests and documentation matter as much as features.
    expected output, then wait for the owner to paste the result.
 3. **Claude never runs git.** At each checkpoint: say it is time to commit, list changed files, give a
    Conventional Commits message (`feat:`, `fix:`, `test:`, `docs:`, `chore:`, `refactor:`, `ci:`).
-   Keep commits small.
+   Keep commits small. **Always say explicitly whether to `git push` now or not yet** (push when the
+   work is verified: build/tests pass and nothing is half-done).
+   **Branch workflow** (from step 2 on): one branch per step, named `<type>/<short-name>`
+   (e.g. `chore/infrastructure`, `feat/greenhouse-connector`), created from an up-to-date `main`.
+   Small commits on the branch, then a Pull Request on GitHub (give the owner a PR title in
+   Conventional Commits form and a short description), merged with **Squash and merge**. After the
+   merge: back to `main`, pull, delete the local branch. `gh` CLI is not installed: PRs are opened in
+   the GitHub web UI.
 4. Plan first, then build in small steps. After each step: summary, verification commands, commit message.
 5. **Talk to the owner in Romanian.** Code, comments, commits and docs are in **English**.
 6. Explain every new dependency in one line before adding it. Prefer Spring / JDK standard library.
@@ -78,8 +85,17 @@ cd frontend; npm run lint; npm run build
 Current: **Milestone 1** (see `docs/ROADMAP.md` for the step checklist).
 
 - [x] Docs skeleton
-- [ ] Owner: scaffold backend (Spring Initializr) and frontend (Vite); install Docker Desktop
-- Next: step 2, infrastructure and configuration.
+- [x] Scaffold: Spring Boot 4.2.0 (starters: webmvc, data-jpa, flyway, validation, actuator;
+      Testcontainers 2.x), React 19 + Vite 8 + TypeScript 6 + ESLint 10
+- [ ] Step 2 + 2b (branch `chore/infrastructure`): Docker Compose, profiles, `.env.example`,
+      GitHub Actions CI (`.github/workflows/ci.yml`: backend `./mvnw -B verify` on JDK 21,
+      frontend `npm ci` + lint + build on Node 24) — written, waiting for the first CI run on the PR
+- [ ] Owner: Docker Desktop installed but blocked by a pending Windows update (WSL features are
+      pended until "Update and restart").
+
+Configuration conventions: env vars `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USERNAME`, `DB_PASSWORD`;
+the dev profile imports the repo-root `.env`; PostgreSQL image `postgres:18-alpine` in both
+`docker-compose.yml` and `TestcontainersConfiguration`.
 
 Verified example sources (checked against the live public APIs on 2026-11-22):
 - Greenhouse `scbitdefendersrl` (Bitdefender): 54 jobs, many in Bucharest/Iasi. API host is

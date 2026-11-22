@@ -1,0 +1,24 @@
+# Local infrastructure for development. Values come from .env in this folder (see .env.example);
+# the defaults below are used when .env is missing.
+services:
+  postgres:
+    # Keep in sync with TestcontainersConfiguration.POSTGRES_IMAGE.
+    image: postgres:18-alpine
+    container_name: init-postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME:-init}
+      POSTGRES_USER: ${DB_USERNAME:-init}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-init}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      # PostgreSQL 18+ images keep their data under /var/lib/postgresql.
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:

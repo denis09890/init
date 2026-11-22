@@ -3,9 +3,10 @@
 ## Milestone 1 — Foundation and ingestion (in progress)
 
 - [x] 1. Documentation skeleton: README, CLAUDE.md, architecture, roadmap, ADRs
-- [ ] 0. Scaffold: Spring Boot backend (Spring Initializr) and React + TypeScript frontend (Vite)
-- [ ] 2. Infrastructure: Docker Compose with PostgreSQL, Spring profiles (`dev`, `test`),
+- [x] 0. Scaffold: Spring Boot backend (Spring Initializr) and React + TypeScript frontend (Vite)
+- [x] 2. Infrastructure: Docker Compose with PostgreSQL, Spring profiles (`dev`, `test`),
       environment-based configuration, `.env.example`, root `.gitignore`
+- [x] 2b. GitHub Actions CI for backend and frontend (moved early so every pull request is checked)
 - [ ] 3. Flyway migrations and JPA mapping for the data model
 - [ ] 4. Company and source configuration from YAML, upserted at startup, with verified example companies
 - [ ] 5. Connectors with unit tests on recorded fixtures
@@ -22,7 +23,7 @@
   - [ ] Scheduler
 - [ ] 8. REST API: postings search and detail, companies, dev-only ingestion trigger, health
 - [ ] 9. Frontend: postings feed with filters and search, detail view
-- [ ] 10. GitHub Actions CI for backend and frontend
+- [ ] 10. CI hardening: branch protection on `main`, status badge in the README
 - [ ] 11. End-to-end check on a fresh clone, documentation pass
 
 **Definition of done:** all tests pass locally and in CI; a fresh clone runs with the README
