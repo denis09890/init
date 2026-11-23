@@ -16,11 +16,11 @@
   - [x] SmartRecruiters
   - [x] Generic schema.org JSON-LD (with `robots.txt` support)
 - [x] 6. Rule-based classifier with English and Romanian test cases
-- [ ] 7. Ingestion pipeline with Testcontainers integration tests
-  - [ ] Raw storage, normalization, upsert, NEW / UPDATED / CLOSED detection
-  - [ ] Ingestion runs and per-source error isolation
-  - [ ] Parallel fetch on virtual threads, per-host rate limiting, retries with backoff
-  - [ ] Scheduler
+- [x] 7. Ingestion pipeline with Testcontainers integration tests
+  - [x] Raw storage, normalization, upsert, NEW / UPDATED / CLOSED detection
+  - [x] Ingestion runs and per-source error isolation
+  - [x] Parallel fetch on virtual threads, per-host rate limiting, retries with backoff
+  - [x] Scheduler
 - [ ] 8. REST API: postings search and detail, companies, dev-only ingestion trigger, health
 - [ ] 9. Frontend: postings feed with filters and search, detail view
 - [ ] 10. CI hardening: branch protection on `main`, status badge in the README
