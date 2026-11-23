@@ -290,7 +290,8 @@ Design notes:
 
 - The read side uses `JdbcClient` and plain SQL, not JPA: the queries need PostgreSQL features
   (full-text search, `unnest` on the locations array) and return flat records. Every value is a bound
-  parameter; the only SQL text added dynamically are fixed fragments chosen by code.
+  parameter; the only SQL text added dynamically are fixed fragments chosen by code
+  ([ADR 0004](adr/0004-read-api-with-plain-sql.md)).
 - The API exposes a short snippet and the link to the original posting, never the full description or
   the raw payload (see ADR 0002).
 - Controllers are thin; there is no service layer because the endpoints only read.
@@ -309,7 +310,7 @@ talks to the REST API above. In development the Vite server proxies `/api` to th
   (`/postings/:id`) with a link to the original.
 - **The URL is the state.** Filters and the page number live in the query string, using the API's own
   parameter names (`src/lib/filters.ts`): a search can be shared and the back button works. Unknown
-  values in the URL are dropped, never an error.
+  values in the URL are dropped, never an error ([ADR 0005](adr/0005-frontend-url-as-state.md)).
 - **Data loading** is one small hook (`useJson`): it aborts requests that are no longer wanted,
   ignores outcomes of old requests and keeps the previous results on screen while new ones load. No
   data-fetching library is needed for two read-only screens.

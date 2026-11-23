@@ -2,6 +2,7 @@
 
 > **Init your career.** Early-career opportunities in Romania, aggregated in one place.
 
+[![CI](https://github.com/denis09890/init/actions/workflows/ci.yml/badge.svg)](https://github.com/denis09890/init/actions/workflows/ci.yml)
 ![Status](https://img.shields.io/badge/status-Milestone%201%20in%20progress-yellow)
 
 Init collects internships, summer practice, working-student roles, graduate and trainee programs and
@@ -104,7 +105,8 @@ Ground rules:
 > These instructions are being built up during Milestone 1 and will be verified on a fresh clone
 > before the milestone is closed.
 
-**Prerequisites:** JDK 21 or newer, Node.js 20.19+ (or 22.12+), Docker Desktop.
+**Prerequisites:** JDK 21 or newer, Node.js 24 (22.18 or newer also works: the frontend tests run
+TypeScript directly with Node), Docker Desktop (or any Docker engine with Compose).
 
 ```powershell
 # 1. Configuration
@@ -167,6 +169,14 @@ npm test
 npm run build
 ```
 
+## Development workflow
+
+- `main` is protected: every change arrives through a pull request that must pass CI (backend build and
+  tests, frontend lint, tests and build) before it can be merged.
+- One branch per piece of work, named `<type>/<short-name>`; commits follow
+  [Conventional Commits](https://www.conventionalcommits.org/); pull requests are squash-merged.
+- Significant decisions are recorded as [architecture decision records](docs/adr/).
+
 ## Roadmap
 
 | Milestone | Scope | Status |
@@ -180,7 +190,9 @@ Full breakdown in [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Screenshots
 
-_Coming with the first version of the frontend._
+| Postings list | Posting detail |
+|---|---|
+| ![Postings list with search and filters](docs/images/postings.png) | ![Posting detail with a link to the original](docs/images/posting-detail.png) |
 
 ## Documentation
 
