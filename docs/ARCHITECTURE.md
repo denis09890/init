@@ -241,9 +241,12 @@ stored once, not on every run.
 | `search_vector` | generated `tsvector` over title and snippet, GIN index |
 
 Full-text search uses the `simple` text-search configuration, because postings are a mix of English and
-Romanian and a language-specific stemmer would mangle the other language. Known limitation: `simple`
-neither stems nor removes diacritics, so `practica` does not match `practică`. The search API will
-normalize queries; a diacritic-insensitive index (`unaccent`) is a Milestone 2 candidate.
+Romanian and a language-specific stemmer would mangle the other language. `simple` does not remove
+diacritics, so the generated `search_vector` removes the Romanian ones itself (`translate`, both the
+cedilla and the comma-below forms, migration V3) and the API removes them from the query the same
+way (`Diacritics`): `practica` finds `Practică`. A test checks that the database and Java replace
+exactly the same characters. No `unaccent` extension is needed. Limits: there is no stemming
+(`internship` does not find `internships`), and only Romanian diacritics are handled.
 
 Hashes (`payload_hash`, `content_hash`) are hex-encoded SHA-256 stored as `varchar(64)`. Timestamps
 are `timestamptz`, mapped to `java.time.Instant`. Classification enums are owned by the
@@ -260,13 +263,41 @@ Indexes support the feed filters: `(is_early_career, location_eligible, status, 
 
 | Method and path | Purpose |
 |---|---|
-| `GET /api/postings` | Filters, pagination, full-text `q`. Early-career only by default. |
-| `GET /api/postings/{id}` | Posting detail with a link to the original. |
-| `GET /api/companies` | Companies with active sources. |
-| `POST /api/admin/ingestion/run` | Manual ingestion trigger, `dev` profile only. |
+| `GET /api/postings` | Filters, pagination, full-text `q`. Open early-career postings in Romania by default. |
+| `GET /api/postings/{id}` | One posting (open or closed) with a link to the original. |
+| `GET /api/companies` | Active companies with their open and early-career posting counts. |
+| `POST /api/admin/ingestion/run` | Manual ingestion trigger, `dev` profile only; returns when every source is done. |
 | `GET /actuator/health` | Health check. |
 
-Errors use RFC 9457 `ProblemDetail` responses.
+**`GET /api/postings` parameters** (all optional):
+
+| Parameter | Meaning |
+|---|---|
+| `q` | Full-text query over title and snippet, ignoring case and diacritics. Best match first. |
+| `domain`, `type` | One or more `Domain` / `OpportunityType` values, repeated or comma-separated. |
+| `company` | Company slug. |
+| `city` | Part of a location name, ignoring case and diacritics (`timisoara` finds `Timișoara`). |
+| `remote` | `ONSITE`, `HYBRID`, `REMOTE` or `UNKNOWN`. |
+| `language`, `paid` | `en` / `ro`; `true` / `false` (postings that do not say are excluded when set). |
+| `earlyCareer`, `romaniaOnly` | Both `true` by default; set to `false` to see everything else. |
+| `page`, `size` | Zero-based page, default size 20, maximum 100. |
+
+The response is `{items, page, size, totalItems, totalPages}`. Results are newest first, with undated
+postings last; with `q` the best match comes first. Postings are never closed in the feed: only
+`status = OPEN` is listed, while the detail endpoint also returns closed postings.
+
+Design notes:
+
+- The read side uses `JdbcClient` and plain SQL, not JPA: the queries need PostgreSQL features
+  (full-text search, `unnest` on the locations array) and return flat records. Every value is a bound
+  parameter; the only SQL text added dynamically are fixed fragments chosen by code.
+- The API exposes a short snippet and the link to the original posting, never the full description or
+  the raw payload (see ADR 0002).
+- Controllers are thin; there is no service layer because the endpoints only read.
+- Errors use RFC 9457 `ProblemDetail`: invalid parameters (`size=0`, an unknown enum value, a
+  non-numeric id) give 400, an unknown posting 404, an ingestion already in progress 409.
+- The admin endpoint carries `@Profile("dev")`, so in any other profile it does not exist (404). A
+  test checks this.
 
 ## Configuration and profiles
 
