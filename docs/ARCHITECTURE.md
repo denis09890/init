@@ -100,30 +100,63 @@ public interface JobSourceConnector {
 
 All HTTP goes through `SourceHttpClient` (JDK `HttpClient` behind Spring `RestClient`), which sets the
 `InitBot` User-Agent and timeouts (`init.http.*`) and turns failures into `SourceFetchException`
-with the HTTP status and whether a retry makes sense (I/O errors, 429, 5xx). Rate limiting and
-retries are added in the ingestion step.
+with the HTTP status and whether a retry makes sense (I/O errors, 429, 5xx). It also applies the
+per-host rate limit and the retries described under *Resilience*.
 
 Connector tests run against recorded API responses in `src/test/resources/fixtures/`, trimmed to a
 few postings with descriptions replaced, so the repository never republishes job descriptions.
 
+### Ingestion flow
+
+For one source, `IngestionService` does the following. Fetching and normalizing happen outside any
+transaction, so a slow network never holds a database connection; storing is one short transaction.
+
+1. `IngestionRunRecorder.start` writes a `RUNNING` row to `ingestion_runs` (its own transaction).
+2. The connector fetches the raw postings; each one is normalized. A posting that cannot be
+   normalized, or whose id, title or URL would not fit its column, is **skipped**, not fatal.
+3. `PostingSynchronizer.synchronize` stores the batch in one transaction (below).
+4. The run is closed as `SUCCEEDED` with its counters, or `FAILED` with the error message. Skipped
+   postings leave a note in `error_message` on a succeeded run.
+
+`IngestionOrchestrator` runs this for every active source of every active company, in parallel on
+virtual threads (at most `init.ingestion.max-parallel-sources` at once, below the connection pool
+size). Only one full ingestion runs at a time; a second request gets `IngestionAlreadyRunningException`.
+`IngestionScheduler` starts a run every `init.ingestion.interval` (fixed delay, so runs never
+overlap) and is switched off in the `test` profile.
+
 ### Change detection
 
-- **NEW**: `(company_source_id, external_id)` not seen before.
-- **UPDATED**: the posting exists and its `content_hash` changed. The hash is computed over the
-  *normalized* fields (title, URL, locations, description text), not the raw payload, so volatile
-  fields such as API timestamps do not cause false updates.
-- **CLOSED**: an open posting is missing from the latest **successful** run of its source. A failed or
-  partial run never closes postings.
-- A closed posting that reappears is reopened (`status = OPEN`, `closed_at = null`).
+`PostingSynchronizer` compares the batch with what is stored for that source:
+
+- **NEW**: `(company_source_id, external_id)` not seen before; the posting is classified and stored.
+- **UPDATED**: the posting exists and its `content_hash` changed; it is refreshed and classified
+  again. The hash covers the *normalized* fields (title, URL, locations, country, workplace type,
+  description, department, employment type, experience level), not the raw payload and not the
+  posting date, so volatile API timestamps do not cause false updates.
+- **CLOSED**: an open posting that the source no longer publishes. This only happens after a batch
+  was fetched successfully, so a failed run never closes anything. Postings that were skipped
+  because they could not be normalized still count as published. Known trade-off: a source that
+  successfully answers with an empty list closes all its postings.
+- A closed posting that reappears is reopened (`status = OPEN`, `closed_at = null`) and counted as
+  updated.
+- A source that lists the same id twice is stored once (first occurrence wins).
+- Every payload is kept in `raw_postings`, once per distinct content (`payload_hash`), so postings
+  can be normalized and classified again later without fetching.
+- The public snippet is the start of the description cut at a word boundary, at most 300
+  characters (`Snippets`); the full description is never stored outside the raw payload.
 
 ### Resilience
 
-- Each source is fetched in isolation. An exception is recorded on its `ingestion_runs` row and never
-  affects other sources.
-- Fetching runs on virtual threads. A per-host limiter (a `Semaphore` for concurrency plus a minimum
-  delay between requests) keeps the load on each host polite.
-- Transient failures (timeouts, HTTP 429 and 5xx) are retried with exponential backoff and jitter.
-  HTTP 4xx other than 429 fails fast.
+- Each source is ingested in isolation. Whatever fails ends up on its `ingestion_runs` row and in
+  the returned result; nothing is thrown at the other sources.
+- `HostRateLimiter` allows `init.http.max-concurrent-requests-per-host` requests in flight per host
+  (a `Semaphore`) and at least `init.http.min-request-interval` between request starts. Waiting
+  threads are virtual, so waiting is cheap. Different hosts do not slow each other down.
+- `RetryPolicy` retries transient failures (I/O errors, HTTP 429 and 5xx) up to
+  `init.http.max-attempts` times with exponential backoff (doubling from `initial-backoff` up to
+  `max-backoff`) randomized to 50–100% so parallel callers do not retry in lockstep. Other 4xx
+  responses and malformed payloads fail at once. The rate limit applies to each attempt, so a request
+  waiting for its retry does not hold a slot on the host.
 - Implemented with the JDK and Spring only; no resilience library is needed at this scale.
 
 ### HTML sources
@@ -199,6 +232,7 @@ stored once, not on every run.
 | `status` | `OPEN`, `CLOSED` |
 | `content_hash` | hash of the normalized fields, drives UPDATED detection |
 | `is_early_career` | the public API filters on this by default |
+| `location_eligible` | in Romania, or remote and open to Romania/EU; the public API filters on this by default. Postings outside Romania are still stored. |
 | `opportunity_type` | `INTERNSHIP`, `WORKING_STUDENT`, `GRADUATE_PROGRAM`, `JUNIOR`, `OTHER` |
 | `domain` | `SOFTWARE`, `DATA`, `ENGINEERING`, `DESIGN`, `PRODUCT`, `FINANCE`, `MARKETING`, `SALES`, `HR`, `LEGAL`, `OPERATIONS`, `CUSTOMER_SUPPORT`, `RESEARCH`, `OTHER` |
 | `seniority` | `INTERN`, `ENTRY`, `JUNIOR`, `MID`, `SENIOR`, `LEAD`, `UNKNOWN` |
@@ -217,10 +251,10 @@ are `timestamptz`, mapped to `java.time.Instant`. Classification enums are owned
 
 **ingestion_runs**: `id`, `company_source_id`, `source_type`, `started_at`, `finished_at`, `status`
 (`RUNNING`, `SUCCEEDED`, `FAILED`), `fetched_count`, `new_count`, `updated_count`, `closed_count`,
-`error_message`.
+`error_message` (the failure on a failed run, or a note about skipped postings on a succeeded one).
 
-Indexes support the feed filters: `(is_early_career, status, posted_at desc)`, `opportunity_type`,
-`domain`, `company_id`, plus the GIN indexes above.
+Indexes support the feed filters: `(is_early_career, location_eligible, status, posted_at desc)`,
+`opportunity_type`, `domain`, `company_id`, plus the GIN indexes above.
 
 ## REST API (Milestone 1)
 
@@ -238,8 +272,12 @@ Errors use RFC 9457 `ProblemDetail` responses.
 
 - All environment-specific values come from environment variables. `.env.example` documents them;
   `.env` is git-ignored.
-- `dev`: local PostgreSQL from Docker Compose, manual ingestion endpoint enabled.
+- `dev`: local PostgreSQL from Docker Compose, manual ingestion endpoint enabled, first scheduled
+  ingestion 10 seconds after startup.
 - `test`: PostgreSQL from Testcontainers, scheduler disabled.
+- Ingestion and HTTP behaviour is tuned with `init.ingestion.*` (scheduler on/off, interval, initial
+  delay, parallel sources) and `init.http.*` (timeouts, per-host concurrency and spacing, retries);
+  the defaults are listed in `application.yaml`.
 - Companies and their sources are configured in `backend/src/main/resources/companies.yml`
   (see below). The `test` profile disables the startup sync; tests synchronize what they need.
 
