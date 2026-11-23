@@ -22,7 +22,7 @@
   - [x] Parallel fetch on virtual threads, per-host rate limiting, retries with backoff
   - [x] Scheduler
 - [x] 8. REST API: postings search and detail, companies, dev-only ingestion trigger, health
-- [ ] 9. Frontend: postings feed with filters and search, detail view
+- [x] 9. Frontend: postings feed with filters and search, detail view
 - [ ] 10. CI hardening: branch protection on `main`, status badge in the README
 - [ ] 11. End-to-end check on a fresh clone, documentation pass
 

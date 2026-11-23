@@ -299,6 +299,28 @@ Design notes:
 - The admin endpoint carries `@Profile("dev")`, so in any other profile it does not exist (404). A
   test checks this.
 
+## Frontend
+
+A single-page app in `frontend/` (React, TypeScript, Vite, Tailwind CSS, React Router) that only
+talks to the REST API above. In development the Vite server proxies `/api` to the backend on port
+8080, so no CORS configuration is needed.
+
+- **Pages:** the postings list (`/`) with search, filters and pagination, and the posting detail
+  (`/postings/:id`) with a link to the original.
+- **The URL is the state.** Filters and the page number live in the query string, using the API's own
+  parameter names (`src/lib/filters.ts`): a search can be shared and the back button works. Unknown
+  values in the URL are dropped, never an error.
+- **Data loading** is one small hook (`useJson`): it aborts requests that are no longer wanted,
+  ignores outcomes of old requests and keeps the previous results on screen while new ones load. No
+  data-fetching library is needed for two read-only screens.
+- **Safety:** the link to the original posting comes from company data, so it is rendered only when
+  it is an `http(s)` address (`safeExternalUrl`); external links use `rel="noopener noreferrer"`.
+- **Accessibility:** real buttons and labels, `aria-pressed` on the filter chips, a live region for
+  the result count, visible focus styles; the layout works on a phone and in dark mode.
+- **Tests:** the pure logic (URL <-> filters, date formatting, link validation) is tested with
+  Node's built-in test runner (`npm test`), which needs no extra dependency because the TypeScript
+  config only uses syntax that Node can run directly.
+
 ## Configuration and profiles
 
 - All environment-specific values come from environment variables. `.env.example` documents them;

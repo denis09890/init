@@ -117,11 +117,13 @@ docker compose up -d
 cd backend
 .\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=dev"
 
-# 4. Frontend (http://localhost:5173), in a second terminal
+# 4. Frontend (http://localhost:5173), in a second terminal. It proxies /api to the backend.
 cd frontend
 npm install
 npm run dev
 ```
+
+Open http://localhost:5173: the postings list, with search, filters and a detail page for each posting.
 
 On macOS or Linux use `cp` and `./mvnw` instead.
 
@@ -158,9 +160,10 @@ the container. Set `DB_PORT=5433` in `.env`, then recreate the container with
 cd backend
 .\mvnw.cmd verify
 
-# Frontend: lint and production build
+# Frontend: lint, unit tests and production build
 cd frontend
 npm run lint
+npm test
 npm run build
 ```
 
