@@ -27,3 +27,19 @@ management:
     web:
       exposure:
         include: health, info
+
+init:
+  ingestion:
+    # Scheduled ingestion: a fixed delay between the end of one run and the start of the next.
+    scheduler-enabled: true
+    interval: PT6H
+    initial-delay: PT1M
+    # Sources fetched at the same time. Keep it below the database pool size (10 by default).
+    max-parallel-sources: 4
+  http:
+    # Politeness towards every host we fetch from.
+    max-concurrent-requests-per-host: 2
+    min-request-interval: 200ms
+    max-attempts: 3
+    initial-backoff: 1s
+    max-backoff: 30s

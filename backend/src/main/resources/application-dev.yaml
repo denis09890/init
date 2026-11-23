@@ -9,6 +9,11 @@ spring:
   datasource:
     password: ${DB_PASSWORD:init}
 
+init:
+  ingestion:
+    # Start the first ingestion soon after boot so there is data to look at.
+    initial-delay: PT10S
+
 management:
   endpoint:
     health:

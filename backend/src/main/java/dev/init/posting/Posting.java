@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import dev.init.classification.Classification;
 import dev.init.classification.Domain;
 import dev.init.classification.OpportunityType;
 import dev.init.classification.Seniority;
@@ -93,6 +94,9 @@ public class Posting {
 	@Column(name = "is_early_career", nullable = false)
 	private boolean earlyCareer;
 
+	@Column(nullable = false)
+	private boolean locationEligible;
+
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 32)
 	private OpportunityType opportunityType;
@@ -137,6 +141,7 @@ public class Posting {
 		this.lastSeenAt = seenAt;
 		this.status = PostingStatus.OPEN;
 		this.earlyCareer = false;
+		this.locationEligible = true;
 		this.opportunityType = OpportunityType.OTHER;
 		this.domain = Domain.OTHER;
 		this.seniority = Seniority.UNKNOWN;
@@ -145,14 +150,51 @@ public class Posting {
 	}
 
 	/** Stores the classifier's verdict. {@code language} and {@code paid} may be null when unknown. */
-	public void applyClassification(boolean earlyCareer, OpportunityType opportunityType, Domain domain,
-			Seniority seniority, String language, Boolean paid) {
-		this.earlyCareer = earlyCareer;
-		this.opportunityType = Objects.requireNonNull(opportunityType, "opportunityType");
-		this.domain = Objects.requireNonNull(domain, "domain");
-		this.seniority = Objects.requireNonNull(seniority, "seniority");
-		this.language = language;
-		this.paid = paid;
+	public void applyClassification(Classification classification) {
+		Objects.requireNonNull(classification, "classification");
+		this.earlyCareer = classification.earlyCareer();
+		this.locationEligible = classification.locationEligible();
+		this.opportunityType = classification.opportunityType();
+		this.domain = classification.domain();
+		this.seniority = classification.seniority();
+		this.language = classification.language();
+		this.paid = classification.paid();
+	}
+
+	/**
+	 * Replaces the content fields after the source changed the posting. Lifecycle fields
+	 * ({@code firstSeenAt}, {@code status}, ...) are untouched; use {@link #markSeen}.
+	 */
+	public void refresh(String title, String url, List<String> locations, RemoteType remoteType, String snippet,
+			Instant postedAt, String contentHash) {
+		this.title = Objects.requireNonNull(title, "title");
+		this.url = Objects.requireNonNull(url, "url");
+		this.locations = new ArrayList<>(Objects.requireNonNull(locations, "locations"));
+		this.remoteType = Objects.requireNonNull(remoteType, "remoteType");
+		this.snippet = requireValidSnippet(snippet);
+		this.postedAt = postedAt;
+		this.contentHash = Objects.requireNonNull(contentHash, "contentHash");
+	}
+
+	/**
+	 * Records that the posting was still published at {@code seenAt}. A closed posting that shows up
+	 * again is reopened.
+	 * @return {@code true} if the posting was closed and is open again
+	 */
+	public boolean markSeen(Instant seenAt) {
+		this.lastSeenAt = Objects.requireNonNull(seenAt, "seenAt");
+		if (status == PostingStatus.CLOSED) {
+			this.status = PostingStatus.OPEN;
+			this.closedAt = null;
+			return true;
+		}
+		return false;
+	}
+
+	/** The source no longer publishes the posting. */
+	public void close(Instant closedAt) {
+		this.status = PostingStatus.CLOSED;
+		this.closedAt = Objects.requireNonNull(closedAt, "closedAt");
 	}
 
 	@PreUpdate
@@ -234,6 +276,10 @@ public class Posting {
 
 	public boolean isEarlyCareer() {
 		return earlyCareer;
+	}
+
+	public boolean isLocationEligible() {
+		return locationEligible;
 	}
 
 	public OpportunityType getOpportunityType() {

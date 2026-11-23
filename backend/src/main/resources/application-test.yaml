@@ -4,6 +4,9 @@ init:
   catalog:
     # Tests start from an empty database and synchronize the catalogs they need explicitly.
     sync-on-startup: false
+  ingestion:
+    # Tests trigger ingestion explicitly.
+    scheduler-enabled: false
 
 logging:
   level:
