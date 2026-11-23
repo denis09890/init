@@ -85,6 +85,15 @@ public class IngestionRun {
 		this.status = IngestionRunStatus.SUCCEEDED;
 	}
 
+	/**
+	 * Like {@link #succeed(int, int, int, int, Instant)}, with a note about postings that could not be
+	 * processed. The run still counts as succeeded: the source answered and its other postings were stored.
+	 */
+	public void succeed(int fetched, int created, int updated, int closed, String warning, Instant finishedAt) {
+		succeed(fetched, created, updated, closed, finishedAt);
+		this.errorMessage = truncate(warning);
+	}
+
 	public void fail(String errorMessage, Instant finishedAt) {
 		requireRunning();
 		this.errorMessage = truncate(errorMessage);

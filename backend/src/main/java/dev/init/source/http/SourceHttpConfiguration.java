@@ -23,7 +23,10 @@ class SourceHttpConfiguration {
 			.requestFactory(requestFactory)
 			.defaultHeader(HttpHeaders.USER_AGENT, properties.userAgent())
 			.build();
-		return new SourceHttpClient(restClient);
+		return new SourceHttpClient(restClient,
+				new HostRateLimiter(properties.maxConcurrentRequestsPerHost(), properties.minRequestInterval()),
+				RetryPolicy.exponential(properties.maxAttempts(), properties.initialBackoff(),
+						properties.maxBackoff()));
 	}
 
 }

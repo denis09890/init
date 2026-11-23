@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import dev.init.classification.Classification;
 import dev.init.classification.Domain;
 import dev.init.classification.OpportunityType;
 import dev.init.classification.Seniority;
@@ -72,7 +73,8 @@ class PersistenceIntegrationTests {
 	@Test
 	void persistsAndReloadsPostingWithLocationsAndClassification() {
 		Posting posting = posting("job-1", "Software Engineering Intern", "Join our Bucharest team for the summer.");
-		posting.applyClassification(true, OpportunityType.INTERNSHIP, Domain.SOFTWARE, Seniority.INTERN, "en", true);
+		posting.applyClassification(new Classification(true, OpportunityType.INTERNSHIP, Domain.SOFTWARE,
+				Seniority.INTERN, false, "en", true, List.of()));
 		postings.saveAndFlush(posting);
 		entityManager.clear();
 
@@ -84,6 +86,7 @@ class PersistenceIntegrationTests {
 		assertThat(reloaded.getCompany().getSlug()).isEqualTo("example-corp");
 		assertThat(reloaded.getStatus()).isEqualTo(PostingStatus.OPEN);
 		assertThat(reloaded.isEarlyCareer()).isTrue();
+		assertThat(reloaded.isLocationEligible()).isFalse();
 		assertThat(reloaded.getOpportunityType()).isEqualTo(OpportunityType.INTERNSHIP);
 		assertThat(reloaded.getDomain()).isEqualTo(Domain.SOFTWARE);
 		assertThat(reloaded.getPaid()).isTrue();
