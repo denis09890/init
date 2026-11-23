@@ -125,6 +125,27 @@ npm run dev
 
 On macOS or Linux use `cp` and `./mvnw` instead.
 
+**What happens at startup:** the company catalog (`backend/src/main/resources/companies.yml`) is
+synchronized into the database and, in the `dev` profile, the first ingestion starts after 10 seconds
+and then repeats every 6 hours. A first run takes about 30 seconds (one request per posting for some
+sources, paced politely). Then try the API:
+
+```powershell
+# Open early-career postings in Romania, newest first
+Invoke-RestMethod "http://localhost:8080/api/postings?size=5" | ConvertTo-Json -Depth 5
+
+# Search (diacritics are ignored) and filter
+Invoke-RestMethod "http://localhost:8080/api/postings?q=practica&city=timisoara&type=WORKING_STUDENT"
+
+# Companies with their posting counts
+Invoke-RestMethod "http://localhost:8080/api/companies"
+
+# Start an ingestion by hand (dev profile only)
+Invoke-RestMethod -Method Post "http://localhost:8080/api/admin/ingestion/run"
+```
+
+The filters are listed in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#rest-api-milestone-1).
+
 **Troubleshooting:** `password authentication failed for user "init"` usually means a PostgreSQL
 installed directly on your machine already listens on port 5432, so the backend reaches it instead of
 the container. Set `DB_PORT=5433` in `.env`, then recreate the container with
