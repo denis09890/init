@@ -192,7 +192,7 @@ Full breakdown in [docs/ROADMAP.md](docs/ROADMAP.md).
 
 | Postings list | Posting detail |
 |---|---|
-| ![Postings list with search and filters](docs/images/postings.png) | ![Posting detail with a link to the original](docs/images/posting-detail.png) |
+| ![Postings list with search and filters](docs/images/list.png) | ![Posting detail with a link to the original](docs/images/details.png) |
 
 ## Documentation
 
