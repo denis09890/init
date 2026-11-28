@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workzag-jobs>
+  <position>
+    <id>1000001</id>
+    <subcompany>Example SRL</subcompany>
+    <office>Cluj-Napoca</office>
+    <additionalOffices>
+      <office>Timișoara</office>
+    </additionalOffices>
+    <department>Engineering</department>
+    <recruitingCategory>Internships</recruitingCategory>
+    <name>Software Developer Intern</name>
+    <jobDescriptions>
+      <jobDescription>
+        <name>About the role</name>
+        <value><![CDATA[<p>Description shortened for the test fixture.</p>]]></value>
+      </jobDescription>
+      <jobDescription>
+        <name>What you&#039;ll learn</name>
+        <value><![CDATA[<ul><li>Build product features.</li></ul>]]></value>
+      </jobDescription>
+    </jobDescriptions>
+    <employmentType>intern</employmentType>
+    <seniority>student</seniority>
+    <schedule>full-time</schedule>
+    <keywords>Java,Spring</keywords>
+    <occupation>software_and_web_development</occupation>
+    <occupationCategory>it_software</occupationCategory>
+    <createdAt>2026-11-26T16:55:38+00:00</createdAt>
+  </position>
+  <position>
+    <id>1000002</id>
+    <office>Remote</office>
+    <name>Customer Support Specialist</name>
+    <recruitingCategory>Customer Success</recruitingCategory>
+    <jobDescriptions>
+      <jobDescription>
+        <name>Your tasks</name>
+        <value><![CDATA[<p>Description shortened for the test fixture.</p>]]></value>
+      </jobDescription>
+    </jobDescriptions>
+    <employmentType>permanent</employmentType>
+    <seniority>entry-level</seniority>
+    <schedule>full-or-part-time</schedule>
+    <yearsOfExperience>lt-1</yearsOfExperience>
+    <createdAt>2016-05-31T12:14:07+0200</createdAt>
+    <salaryInformation>
+      <min>4000.00</min>
+      <currencyCode>RON</currencyCode>
+      <type>monthly</type>
+    </salaryInformation>
+  </position>
+</workzag-jobs>

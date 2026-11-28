@@ -34,17 +34,25 @@ public class SourceHttpClient {
 	}
 
 	public String getJson(URI uri) {
-		return get(uri, MediaType.APPLICATION_JSON);
+		return get(uri, String.class, "", MediaType.APPLICATION_JSON);
 	}
 
 	public String getHtml(URI uri) {
-		return get(uri, MediaType.TEXT_HTML);
+		return get(uri, String.class, "", MediaType.TEXT_HTML);
+	}
+
+	/**
+	 * The body as bytes, so the XML parser decodes it with the encoding the document declares; a
+	 * {@code text/xml} response without a charset would otherwise be read as ISO-8859-1.
+	 */
+	public byte[] getXml(URI uri) {
+		return get(uri, byte[].class, new byte[0], MediaType.APPLICATION_XML, MediaType.TEXT_XML);
 	}
 
 	/** Like a GET for plain text, but a 404 or 410 means "not there" rather than a failure. */
 	public Optional<String> getTextIfPresent(URI uri) {
 		try {
-			return Optional.of(get(uri, MediaType.TEXT_PLAIN));
+			return Optional.of(get(uri, String.class, "", MediaType.TEXT_PLAIN));
 		}
 		catch (SourceFetchException ex) {
 			int status = ex.statusCode().orElse(0);
@@ -59,15 +67,15 @@ public class SourceHttpClient {
 	 * The rate limit applies to each attempt, not around the retries, so a request that is waiting to
 	 * be retried does not hold a slot on the host.
 	 */
-	private String get(URI uri, MediaType accept) {
+	private <T> T get(URI uri, Class<T> bodyType, T emptyBody, MediaType... accept) {
 		String host = uri.getHost() == null ? "" : uri.getHost();
-		return retryPolicy.execute(() -> rateLimiter.execute(host, () -> request(uri, accept)));
+		return retryPolicy.execute(() -> rateLimiter.execute(host, () -> request(uri, bodyType, emptyBody, accept)));
 	}
 
-	private String request(URI uri, MediaType accept) {
+	private <T> T request(URI uri, Class<T> bodyType, T emptyBody, MediaType... accept) {
 		try {
-			String body = restClient.get().uri(uri).accept(accept).retrieve().body(String.class);
-			return body == null ? "" : body;
+			T body = restClient.get().uri(uri).accept(accept).retrieve().body(bodyType);
+			return body == null ? emptyBody : body;
 		}
 		catch (RestClientResponseException ex) {
 			throw SourceFetchException.httpStatus(uri, ex.getStatusCode().value(), ex);

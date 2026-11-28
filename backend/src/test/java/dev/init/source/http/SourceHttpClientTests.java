@@ -76,6 +76,17 @@ class SourceHttpClientTests {
 	}
 
 	@Test
+	void readsXmlAsBytesSoTheDeclaredEncodingIsKept() {
+		byte[] xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><a>Timișoara</a>"
+			.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+		server.expect(requestTo(URL)).andRespond(withSuccess(xml, MediaType.TEXT_XML));
+
+		assertThat(client.getXml(URI.create(URL))).isEqualTo(xml);
+
+		server.verify();
+	}
+
+	@Test
 	void aMissingTextFileIsNotAnErrorAndNotRetried() {
 		server.expect(requestTo("https://example.com/robots.txt")).andRespond(withStatus(HttpStatus.NOT_FOUND));
 

@@ -1,0 +1,78 @@
+{
+  "jobs": [
+    {
+      "id": "0a1b2c3d-0000-4000-8000-000000000001",
+      "title": "Software Engineer Intern",
+      "department": "Engineering",
+      "team": "Platform",
+      "employmentType": "Intern",
+      "location": "Bucharest, Romania",
+      "secondaryLocations": [
+        {
+          "location": "Cluj-Napoca",
+          "address": {
+            "postalAddress": { "addressRegion": "", "addressCountry": "Romania", "addressLocality": "Cluj-Napoca" }
+          }
+        }
+      ],
+      "isRemote": true,
+      "workplaceType": "Hybrid",
+      "address": {
+        "postalAddress": { "postalCode": "", "addressRegion": "", "addressCountry": "Romania", "addressLocality": "Bucharest" }
+      },
+      "publishedAt": "2026-11-20T09:15:00.000+00:00",
+      "isListed": true,
+      "jobUrl": "https://jobs.ashbyhq.com/example/0a1b2c3d-0000-4000-8000-000000000001",
+      "applyUrl": "https://jobs.ashbyhq.com/example/0a1b2c3d-0000-4000-8000-000000000001/application",
+      "descriptionHtml": "<p>Description shortened for the test fixture.</p><ul><li>Build product features.</li></ul>",
+      "descriptionPlain": "Description shortened for the test fixture.\n\nBuild product features."
+    },
+    {
+      "id": "0a1b2c3d-0000-4000-8000-000000000002",
+      "title": "Engineering Manager - EU",
+      "department": "Engineering",
+      "team": "EMEA Engineering",
+      "employmentType": "FullTime",
+      "location": "Remote - European Union",
+      "secondaryLocations": [
+        {
+          "location": "Berlin",
+          "address": {
+            "postalAddress": { "addressRegion": "", "addressCountry": "Germany", "addressLocality": "Berlin" }
+          }
+        },
+        {
+          "location": "Romania",
+          "address": { "postalAddress": { "addressCountry": "Romania" } }
+        }
+      ],
+      "isRemote": true,
+      "workplaceType": "Remote",
+      "address": {
+        "postalAddress": { "postalCode": "", "addressRegion": "", "addressCountry": "European Union", "addressLocality": "" }
+      },
+      "publishedAt": "2024-03-04T14:29:08.532+00:00",
+      "isListed": true,
+      "jobUrl": "https://jobs.ashbyhq.com/example/0a1b2c3d-0000-4000-8000-000000000002",
+      "applyUrl": "https://jobs.ashbyhq.com/example/0a1b2c3d-0000-4000-8000-000000000002/application",
+      "descriptionHtml": "<p>Description shortened for the test fixture.</p><ul><li>Lead the team.</li></ul>"
+    },
+    {
+      "id": "0a1b2c3d-0000-4000-8000-000000000003",
+      "title": "Confidential Search",
+      "department": "Operations",
+      "employmentType": "FullTime",
+      "location": "Bucharest, Romania",
+      "secondaryLocations": [],
+      "isRemote": false,
+      "workplaceType": "OnSite",
+      "publishedAt": "2026-11-01T08:00:00.000+00:00",
+      "isListed": false,
+      "jobUrl": "https://jobs.ashbyhq.com/example/0a1b2c3d-0000-4000-8000-000000000003",
+      "applyUrl": "https://jobs.ashbyhq.com/example/0a1b2c3d-0000-4000-8000-000000000003/application",
+      "descriptionHtml": "<p>Description shortened for the test fixture.</p>",
+      "descriptionPlain": "Description shortened for the test fixture."
+    }
+  ],
+  "apiVersion": "1"
+}
