@@ -216,6 +216,17 @@ measured against a hand-labelled sample of real postings ([EVALUATION.md](EVALUA
 reports precision, recall and accuracy and fails when they drop below a floor. An LLM-based
 implementation can be added behind the same interface and measured on the same set.
 
+### Skills
+
+`SkillExtractor` lists the skills a posting mentions, from a fixed vocabulary of about 70 entries:
+programming languages, frameworks, data and cloud tools, business software, engineering and design
+tools, and spoken languages. Each entry has a display name and the phrases that mean it, matched like
+the classifier's keywords (whole words, case and diacritics ignored). Ambiguous words only count in
+phrases that cannot mean something else: "spring boot" rather than "spring", "golang" rather than "go",
+"advanced Excel" rather than "excel". It runs at ingestion on the title and the full description, so the
+API can show skills although it never stores the description; postings stored earlier get their skills
+on the next run without being counted as updated. The skills feed the planned match score.
+
 ## Data model
 
 Flyway owns the schema; Hibernate only validates it. Enum-like columns are `varchar` with a `CHECK`
@@ -263,6 +274,7 @@ stored once, not on every run.
 | `paid` | nullable: unknown is different from unpaid |
 | `search_vector` | generated `tsvector` over title and snippet, GIN index |
 | `duplicate_of_id` | the earlier posting this one repeats, or null; duplicates are left out of the feed |
+| `skills` | `text[]` of skill names from the extractor's vocabulary, GIN index |
 
 Full-text search uses the `simple` text-search configuration, because postings are a mix of English and
 Romanian and a language-specific stemmer would mangle the other language. `simple` does not remove

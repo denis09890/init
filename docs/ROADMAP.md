@@ -39,7 +39,7 @@ frontend.
 - [x] Manually labeled evaluation set and accuracy report for the rule-based classifier, then a
       measured improvement of the rules ([EVALUATION.md](EVALUATION.md))
 - [x] Cross-source deduplication (same link, or title similarity with `pg_trgm` and a shared location)
-- [ ] Skills extraction
+- [x] Skills extraction (fixed vocabulary, shown on the posting page)
 - [ ] LLM-based classifier behind `PostingClassifier` (structured output, caching by content hash,
       fallback to rules), measured against the same evaluation set
 - [ ] Public read-only deployment with a link (moved ahead of Milestone 3: it needs no accounts)
