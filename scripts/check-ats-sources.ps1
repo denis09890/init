@@ -5,7 +5,7 @@
 
 .DESCRIPTION
     For every company in the candidates file the script tries the usual board identifiers on the
-    public APIs Init already uses (Greenhouse, Lever, SmartRecruiters) and reports, for each board
+    public APIs Init already uses (Greenhouse, Lever, SmartRecruiters, Ashby, Personio) and reports, for each board
     that exists, its name (when the API gives one), how many postings are in Romania and how many
     of those titles look early-career.
 
@@ -75,6 +75,7 @@ function Get-Json([string]$Uri) {
     catch {
         $status = 0
         if ($_.Exception.Response) { $status = [int]$_.Exception.Response.StatusCode }
+        else { Write-Warning ("{0}: {1}" -f $Uri, $_.Exception.Message) }
         return [pscustomobject]@{ Status = $status; Data = $null }
     }
 }
@@ -155,6 +156,47 @@ function Test-SmartRecruiters([string]$Company, [string]$Id) {
     return New-Result $Company 'SMARTRECRUITERS' $Id 'GLOBAL' $name '' $titles
 }
 
+function Test-Ashby([string]$Company, [string]$Board) {
+    $response = Get-Json "https://api.ashbyhq.com/posting-api/job-board/$Board"
+    if ($response.Status -ne 200 -or $null -eq $response.Data) { return $null }
+    # Unlisted jobs are meant to be reached by direct link only; Init skips them too.
+    $jobs = @(ConvertTo-Array $response.Data.jobs | Where-Object { $_.isListed -ne $false })
+    $titles = @($jobs | Where-Object {
+            $job = $_
+            $names = @($job.location) + @($job.secondaryLocations | ForEach-Object { $_.location })
+            $country = ''
+            if ($job.address -and $job.address.postalAddress) { $country = $job.address.postalAddress.addressCountry }
+            Test-InRomania (($names + $country) -join ' ')
+        } | ForEach-Object { $_.title })
+    # Ashby does not return the company name; check the board name and the sample titles by hand.
+    return New-Result $Company 'ASHBY' $Board 'GLOBAL' '' $jobs.Count $titles
+}
+
+function Test-Personio([string]$Company, [string]$Subdomain) {
+    # The identifier becomes a host name; accept a single DNS label only.
+    if ($Subdomain -notmatch '^[a-z0-9]([a-z0-9-]*[a-z0-9])?$') { return $null }
+    Start-Sleep -Milliseconds $DelayMs
+    try {
+        $response = Invoke-WebRequest -Uri "https://$Subdomain.jobs.personio.de/xml" -UseBasicParsing -TimeoutSec 20 -UserAgent $UserAgent
+        $xml = [xml][System.Text.Encoding]::UTF8.GetString($response.RawContentStream.ToArray())
+    }
+    catch {
+        return $null
+    }
+    if ($null -eq $xml.SelectSingleNode('/workzag-jobs')) { return $null }
+    # XPath instead of property access: PowerShell would read .name as the element's own tag name.
+    $positions = @($xml.SelectNodes('/workzag-jobs/position'))
+    $titles = @($positions | Where-Object {
+            $offices = @($_.SelectNodes('office | additionalOffices/office') | ForEach-Object { $_.InnerText })
+            Test-InRomania ($offices -join ' ')
+        } | ForEach-Object { $_.SelectSingleNode('name').InnerText })
+    $name = ''
+    if ($positions.Count -gt 0 -and $positions[0].SelectSingleNode('subcompany')) {
+        $name = $positions[0].SelectSingleNode('subcompany').InnerText
+    }
+    return New-Result $Company 'PERSONIO' $Subdomain 'GLOBAL' $name $positions.Count $titles
+}
+
 function Get-Variants([string]$Name, [string[]]$Extra) {
     $lower = $Name.ToLowerInvariant()
     $joined = $lower -replace '[^a-z0-9]', ''
@@ -188,6 +230,10 @@ foreach ($entry in $entries) {
         $hit = Test-Greenhouse $name $token
         if ($hit) { $results.Add($hit) }
         $hit = Test-Lever $name $token
+        if ($hit) { $results.Add($hit) }
+        $hit = Test-Ashby $name $token
+        if ($hit) { $results.Add($hit) }
+        $hit = Test-Personio $name $token
         if ($hit) { $results.Add($hit) }
     }
     foreach ($id in $variants.Smart) {
