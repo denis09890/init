@@ -350,4 +350,15 @@ application at startup.
 - duplicate slugs or sources in the file, and moving a source to another company, are rejected.
 
 The sync is idempotent and logs what it changed. Every identifier in the file is verified against
-the live public API, and entries added before the curated list exists are marked `example: true`.
+the live public API, and the first entries, added before the catalog grew, are marked `example: true`.
+
+### Finding companies
+
+Board identifiers are never guessed into the catalog. `scripts/check-ats-sources.ps1` reads the
+company names in `scripts/ats-candidates.txt`, tries the usual identifiers on the public Greenhouse,
+Lever and SmartRecruiters APIs (sequentially, with a pause between requests and the `InitBot`
+User-Agent) and reports every board that exists: the board name returned by the API, how many
+postings are located in Romania and how many of their titles look early-career. A person then checks
+that each board really belongs to the company (a token such as `remote` or `wise` can belong to
+somebody else) and adds only those to `companies.yml`. The script reads public APIs only and changes
+nothing; it can be run again at any time to see whether a company has started publishing in Romania.
