@@ -38,7 +38,7 @@ frontend.
       ([ADR 0006](adr/0006-ashby-and-personio-connectors.md))
 - [x] Manually labeled evaluation set and accuracy report for the rule-based classifier, then a
       measured improvement of the rules ([EVALUATION.md](EVALUATION.md))
-- [ ] Cross-source deduplication (canonical URL + title similarity with `pg_trgm`)
+- [x] Cross-source deduplication (same link, or title similarity with `pg_trgm` and a shared location)
 - [ ] Skills extraction
 - [ ] LLM-based classifier behind `PostingClassifier` (structured output, caching by content hash,
       fallback to rules), measured against the same evaluation set

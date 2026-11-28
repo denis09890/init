@@ -151,6 +151,18 @@ overlap) and is switched off in the `test` profile.
 - The public snippet is the start of the description cut at a word boundary, at most 300
   characters (`Snippets`); the full description is never stored outside the raw payload.
 
+### Duplicates
+
+A company sometimes publishes one role twice: two requisitions with the same title in the same city,
+or the same job on two platforms. After every full ingestion `DuplicateDetector` works the marks out
+again from scratch, in one SQL statement: an open posting is a duplicate of an earlier open posting of
+the same company when both have the same link, or when their titles are almost the same (trigram
+similarity of at least 0.9, PostgreSQL's `pg_trgm`) and they share a location. It then points to the
+earliest one through `duplicate_of_id`. The feed and the company counts leave duplicates out; their
+detail pages still work, and nothing is deleted. The same title in another city is not a duplicate,
+since it is a different place to work. When the original closes, the duplicate shows up again on the
+next run.
+
 ### Resilience
 
 - Each source is ingested in isolation. Whatever fails ends up on its `ingestion_runs` row and in
@@ -250,6 +262,7 @@ stored once, not on every run.
 | `language` | ISO 639-1 code of the posting text (`en`, `ro`), nullable |
 | `paid` | nullable: unknown is different from unpaid |
 | `search_vector` | generated `tsvector` over title and snippet, GIN index |
+| `duplicate_of_id` | the earlier posting this one repeats, or null; duplicates are left out of the feed |
 
 Full-text search uses the `simple` text-search configuration, because postings are a mix of English and
 Romanian and a language-specific stemmer would mangle the other language. `simple` does not remove
