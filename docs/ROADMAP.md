@@ -38,10 +38,11 @@ frontend.
       ([ADR 0006](adr/0006-ashby-and-personio-connectors.md))
 - [x] Manually labeled evaluation set and accuracy report for the rule-based classifier, then a
       measured improvement of the rules ([EVALUATION.md](EVALUATION.md))
-- [ ] Cross-source deduplication (canonical URL + title similarity with `pg_trgm`)
-- [ ] Skills extraction
-- [ ] LLM-based classifier behind `PostingClassifier` (structured output, caching by content hash,
-      fallback to rules), measured against the same evaluation set
+- [x] Cross-source deduplication (same link, or title similarity with `pg_trgm` and a shared location)
+- [x] Skills extraction (fixed vocabulary, shown on the posting page)
+- [x] LLM-based classifier (Groq, strict structured output, caching by content hash, fallback to
+      rules; [ADR 0007](adr/0007-llm-classifier.md)); off by default
+- [ ] Measure the LLM classifier against the same evaluation set (needs an API key)
 - [ ] Public read-only deployment with a link (moved ahead of Milestone 3: it needs no accounts)
 
 ## Milestone 3 — Users

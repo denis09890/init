@@ -9,6 +9,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import dev.init.classification.PostingClassifier;
+import dev.init.classification.SkillExtractor;
 import dev.init.company.CompanySource;
 import dev.init.company.CompanySourceRepository;
 import dev.init.posting.Posting;
@@ -44,12 +45,15 @@ public class PostingSynchronizer {
 
 	private final PostingClassifier classifier;
 
+	private final SkillExtractor skills;
+
 	public PostingSynchronizer(CompanySourceRepository sources, PostingRepository postings,
-			RawPostingRepository rawPostings, PostingClassifier classifier) {
+			RawPostingRepository rawPostings, PostingClassifier classifier, SkillExtractor skills) {
 		this.sources = sources;
 		this.postings = postings;
 		this.rawPostings = rawPostings;
 		this.classifier = classifier;
+		this.skills = skills;
 	}
 
 	@Transactional
@@ -93,6 +97,7 @@ public class PostingSynchronizer {
 		Posting posting = new Posting(source, job.externalId(), job.title(), job.url(), job.locations(),
 				job.remoteType(), Snippets.of(job.description()), job.postedAt(), ContentHasher.hash(job), now);
 		posting.applyClassification(classifier.classify(job));
+		posting.applySkills(skills.extract(job));
 		postings.save(posting);
 	}
 
@@ -105,6 +110,8 @@ public class PostingSynchronizer {
 					job.postedAt(), hash);
 			posting.applyClassification(classifier.classify(job));
 		}
+		// cheap, and fills in skills for postings stored before skills existed; unchanged lists write nothing
+		posting.applySkills(skills.extract(job));
 		boolean reopened = posting.markSeen(now);
 		return changed || reopened;
 	}

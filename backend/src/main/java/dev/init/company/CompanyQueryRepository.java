@@ -12,8 +12,8 @@ public class CompanyQueryRepository {
 	private static final String ACTIVE_COMPANIES = """
 			select c.name, c.slug, c.website,
 			       count(p.id) filter (where p.status = 'OPEN') as open_postings,
-			       count(p.id) filter (where p.status = 'OPEN' and p.is_early_career and p.location_eligible)
-			           as early_career_postings
+			       count(p.id) filter (where p.status = 'OPEN' and p.is_early_career and p.location_eligible
+			                           and p.duplicate_of_id is null) as early_career_postings
 			from companies c
 			left join postings p on p.company_id = c.id
 			where c.active

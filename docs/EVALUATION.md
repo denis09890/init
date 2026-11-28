@@ -95,6 +95,22 @@ one data, where the title alone cannot tell. Early career does not change on thi
 one-year rule needs the full description, which the test does not have (see Limitations). The floors
 in the test were raised to just under the new values; they only go up.
 
+## Measuring the LLM classifier
+
+The LLM classifier ([ADR 0007](adr/0007-llm-classifier.md)) is measured on the same labels by
+`LlmClassifierEvaluationTests`. It calls the real API, so it runs only when the key is in the
+environment (about 20 minutes with the default pacing), and writes
+`backend/target/evaluation-report-llm.md`:
+
+```powershell
+cd backend
+$env:GROQ_API_KEY = "<your key>"
+.\mvnw.cmd -B test "-Dtest=LlmClassifierEvaluationTests"
+```
+
+Its results will be added here once measured. The LLM reads the same 300-character excerpts as the
+rules in this test, so the comparison is fair, if pessimistic for both.
+
 ## Limitations
 
 - **Excerpt only.** The classifier sees the first 300 characters of the description here, not the whole

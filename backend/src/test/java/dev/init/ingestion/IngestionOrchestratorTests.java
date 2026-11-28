@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import dev.init.company.Company;
 import dev.init.company.CompanySource;
 import dev.init.company.CompanySourceRepository;
+import dev.init.posting.DuplicateDetector;
 import dev.init.source.SourceRegion;
 import dev.init.source.SourceType;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,29 @@ class IngestionOrchestratorTests {
 	private final CompanySourceRepository sources = mock(CompanySourceRepository.class);
 
 	private final IngestionService ingestion = mock(IngestionService.class);
+
+	private final DuplicateDetector duplicates = mock(DuplicateDetector.class);
+
+	@Test
+	void marksDuplicatesOnceEverySourceIsDone() {
+		when(sources.findActiveWithCompany()).thenReturn(List.of(source("a"), source("b")));
+		when(ingestion.ingest(any())).thenAnswer(invocation -> ok(invocation.getArgument(0)));
+
+		orchestrator(4).runAll();
+
+		verify(duplicates, times(1)).refresh();
+	}
+
+	@Test
+	void aFailingDuplicateDetectionDoesNotFailTheRun() {
+		when(sources.findActiveWithCompany()).thenReturn(List.of(source("a")));
+		when(ingestion.ingest(any())).thenAnswer(invocation -> ok(invocation.getArgument(0)));
+		when(duplicates.refresh()).thenThrow(new RuntimeException("database restarting"));
+
+		IngestionSummary summary = orchestrator(4).runAll();
+
+		assertThat(summary.succeeded()).isEqualTo(1);
+	}
 
 	@Test
 	void ingestsEverySourceAndSummarizesTheResults() {
@@ -127,7 +151,8 @@ class IngestionOrchestratorTests {
 
 	private IngestionOrchestrator orchestrator(int maxParallelSources) {
 		return new IngestionOrchestrator(sources, ingestion,
-				new IngestionProperties(false, Duration.ofHours(6), Duration.ofMinutes(1), maxParallelSources));
+				new IngestionProperties(false, Duration.ofHours(6), Duration.ofMinutes(1), maxParallelSources),
+				duplicates);
 	}
 
 	private static CompanySource source(String slug) {

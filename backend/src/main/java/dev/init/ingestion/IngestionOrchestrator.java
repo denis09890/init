@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import dev.init.company.CompanySource;
 import dev.init.company.CompanySourceRepository;
+import dev.init.posting.DuplicateDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -32,13 +33,16 @@ public class IngestionOrchestrator {
 
 	private final IngestionProperties properties;
 
+	private final DuplicateDetector duplicates;
+
 	private final AtomicBoolean running = new AtomicBoolean();
 
 	public IngestionOrchestrator(CompanySourceRepository sources, IngestionService ingestion,
-			IngestionProperties properties) {
+			IngestionProperties properties, DuplicateDetector duplicates) {
 		this.sources = sources;
 		this.ingestion = ingestion;
 		this.properties = properties;
+		this.duplicates = duplicates;
 	}
 
 	/**
@@ -75,7 +79,19 @@ public class IngestionOrchestrator {
 		IngestionSummary summary = new IngestionSummary(results);
 		log.info("Ingestion finished: {} succeeded, {} failed, totals {}", summary.succeeded(), summary.failed(),
 				summary.totals());
+		refreshDuplicates();
 		return summary;
+	}
+
+	/** Runs after every source, since a duplicate can span two sources of one company. */
+	private void refreshDuplicates() {
+		try {
+			log.info("Duplicate postings marked: {}", duplicates.refresh());
+		}
+		catch (RuntimeException ex) {
+			// the postings are stored; the feed only shows a few duplicates until the next run
+			log.error("Duplicate detection failed", ex);
+		}
 	}
 
 	private SourceIngestionResult ingestOne(CompanySource source, Semaphore permits) {

@@ -36,6 +36,16 @@ init:
     initial-delay: PT1M
     # Sources fetched at the same time. Keep it below the database pool size (10 by default).
     max-parallel-sources: 4
+  llm:
+    # LLM classifier (docs/adr/0007-llm-classifier.md). Off by default; needs GROQ_API_KEY.
+    enabled: ${LLM_ENABLED:false}
+    api-key: ${GROQ_API_KEY:}
+    model: openai/gpt-oss-20b
+    # The free plan allows a few thousand tokens per minute and about 200K per day: about 15 postings
+    # every 3 hours stays well inside that.
+    min-interval: PT12S
+    max-per-run: 15
+    interval: PT3H
   http:
     # Politeness towards every host we fetch from.
     max-concurrent-requests-per-host: 2

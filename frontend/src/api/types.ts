@@ -62,6 +62,8 @@ export interface Posting {
   seniority: Seniority
   language: string | null
   paid: boolean | null
+  /** Skills the posting mentions, from a fixed vocabulary (e.g. "Java", "Power BI", "German"). */
+  skills: string[]
 }
 
 export interface Page<T> {

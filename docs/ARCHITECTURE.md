@@ -151,6 +151,18 @@ overlap) and is switched off in the `test` profile.
 - The public snippet is the start of the description cut at a word boundary, at most 300
   characters (`Snippets`); the full description is never stored outside the raw payload.
 
+### Duplicates
+
+A company sometimes publishes one role twice: two requisitions with the same title in the same city,
+or the same job on two platforms. After every full ingestion `DuplicateDetector` works the marks out
+again from scratch, in one SQL statement: an open posting is a duplicate of an earlier open posting of
+the same company when both have the same link, or when their titles are almost the same (trigram
+similarity of at least 0.9, PostgreSQL's `pg_trgm`) and they share a location. It then points to the
+earliest one through `duplicate_of_id`. The feed and the company counts leave duplicates out; their
+detail pages still work, and nothing is deleted. The same title in another city is not a duplicate,
+since it is a different place to work. When the original closes, the duplicate shows up again on the
+next run.
+
 ### Resilience
 
 - Each source is ingested in isolation. Whatever fails ends up on its `ingestion_runs` row and in
@@ -201,8 +213,28 @@ also marks a junior role.
 
 Every posting is stored; the public API returns only early-career ones by default. The classifier is
 measured against a hand-labelled sample of real postings ([EVALUATION.md](EVALUATION.md)): a test
-reports precision, recall and accuracy and fails when they drop below a floor. An LLM-based
-implementation can be added behind the same interface and measured on the same set.
+reports precision, recall and accuracy and fails when they drop below a floor.
+
+**LLM second pass** ([ADR 0007](adr/0007-llm-classifier.md)), off by default. When `LLM_ENABLED=true`
+and `GROQ_API_KEY` are set, `LlmReclassifier` runs every 3 hours, apart from the ingestion: it reads the
+full description of a few postings the feed can show again from their raw payloads, and asks
+`LlmClassifier` (Groq's chat completions API, model `openai/gpt-oss-20b`, a strict JSON schema whose
+enums are Init's categories) for early career, opportunity type, domain and seniority. Location,
+language and pay stay with the rules. `llm_content_hash` caches the verdict by content: an unchanged
+posting is never sent again. Any failure keeps the rules' verdict. `POST /api/admin/llm/run` starts a
+pass by hand in the dev profile. The classification package itself stays free of I/O; the LLM client
+lives in `classification.llm`.
+
+### Skills
+
+`SkillExtractor` lists the skills a posting mentions, from a fixed vocabulary of about 70 entries:
+programming languages, frameworks, data and cloud tools, business software, engineering and design
+tools, and spoken languages. Each entry has a display name and the phrases that mean it, matched like
+the classifier's keywords (whole words, case and diacritics ignored). Ambiguous words only count in
+phrases that cannot mean something else: "spring boot" rather than "spring", "golang" rather than "go",
+"advanced Excel" rather than "excel". It runs at ingestion on the title and the full description, so the
+API can show skills although it never stores the description; postings stored earlier get their skills
+on the next run without being counted as updated. The skills feed the planned match score.
 
 ## Data model
 
@@ -250,6 +282,9 @@ stored once, not on every run.
 | `language` | ISO 639-1 code of the posting text (`en`, `ro`), nullable |
 | `paid` | nullable: unknown is different from unpaid |
 | `search_vector` | generated `tsvector` over title and snippet, GIN index |
+| `duplicate_of_id` | the earlier posting this one repeats, or null; duplicates are left out of the feed |
+| `skills` | `text[]` of skill names from the extractor's vocabulary, GIN index |
+| `llm_content_hash` | the `content_hash` the LLM classifier last judged; equal means the classification is the LLM's |
 
 Full-text search uses the `simple` text-search configuration, because postings are a mix of English and
 Romanian and a language-specific stemmer would mangle the other language. `simple` does not remove
@@ -279,6 +314,7 @@ Indexes support the feed filters: `(is_early_career, location_eligible, status, 
 | `GET /api/companies` | Active companies with their open and early-career posting counts. |
 | `POST /api/admin/ingestion/run` | Manual ingestion trigger, `dev` profile only; returns when every source is done. |
 | `GET /api/admin/evaluation/sample` | Sample of stored postings for labelling, `dev` profile only ([EVALUATION.md](EVALUATION.md)). |
+| `POST /api/admin/llm/run?limit=10` | One LLM classification pass, `dev` profile only; does nothing unless the LLM is enabled. |
 | `GET /actuator/health` | Health check. |
 
 **`GET /api/postings` parameters** (all optional):
