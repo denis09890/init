@@ -75,6 +75,21 @@ export default function PostingPage() {
         <Detail label="First seen by Init">{formatDate(posting.firstSeenAt)}</Detail>
       </dl>
 
+      {posting.skills.length > 0 && (
+        <section className="mt-6" aria-labelledby="skills-heading">
+          <h2 id="skills-heading" className="text-sm font-medium text-slate-500 dark:text-slate-400">
+            Skills mentioned
+          </h2>
+          <ul className="mt-2 flex flex-wrap gap-2">
+            {posting.skills.map((skill) => (
+              <li key={skill} className="chip">
+                {skill}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {posting.snippet && (
         <section className="mt-6">
           <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400">Preview</h2>
