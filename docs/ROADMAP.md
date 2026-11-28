@@ -1,9 +1,9 @@
 # Roadmap
 
-## Milestone 1 — Foundation and ingestion (in progress)
+## Milestone 1 — Foundation and ingestion (complete)
 
-- [x] 1. Documentation skeleton: README, architecture, roadmap, ADRs
 - [x] 0. Scaffold: Spring Boot backend (Spring Initializr) and React + TypeScript frontend (Vite)
+- [x] 1. Documentation skeleton: README, architecture, roadmap, ADRs
 - [x] 2. Infrastructure: Docker Compose with PostgreSQL, Spring profiles (`dev`, `test`),
       environment-based configuration, `.env.example`, root `.gitignore`
 - [x] 2b. GitHub Actions CI for backend and frontend (moved early so every pull request is checked)
@@ -24,7 +24,7 @@
 - [x] 8. REST API: postings search and detail, companies, dev-only ingestion trigger, health
 - [x] 9. Frontend: postings feed with filters and search, detail view
 - [x] 10. CI hardening: branch protection on `main`, status badge in the README
-- [ ] 11. End-to-end check on a fresh clone, documentation pass
+- [x] 11. End-to-end check on a fresh clone, documentation pass
 
 **Definition of done:** all tests pass locally and in CI; a fresh clone runs with the README
 instructions; ingestion of the example companies works end to end and the postings appear in the
@@ -32,11 +32,12 @@ frontend.
 
 ## Milestone 2 — Intelligence
 
-- [ ] LLM-based classifier behind `PostingClassifier` (structured output, caching by content hash,
-      fallback to rules)
-- [ ] Manually labeled evaluation set and accuracy report (rules vs LLM)
+- [ ] Manually labeled evaluation set and accuracy report for the rule-based classifier, then a
+      measured improvement of the rules
 - [ ] Cross-source deduplication (canonical URL + title similarity with `pg_trgm`)
 - [ ] Skills extraction
+- [ ] LLM-based classifier behind `PostingClassifier` (structured output, caching by content hash,
+      fallback to rules), measured against the same evaluation set
 
 ## Milestone 3 — Users
 
