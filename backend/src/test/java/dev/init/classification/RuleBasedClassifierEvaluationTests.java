@@ -36,21 +36,24 @@ class RuleBasedClassifierEvaluationTests {
 	void earlyCareerPrecisionAndRecall() {
 		ClassifierEvaluation.BinaryCounts estimate = report.earlyCareerEstimated();
 
-		assertThat(estimate.precision()).as("precision").isGreaterThanOrEqualTo(0.90);
-		assertThat(estimate.recall()).as("estimated recall").isGreaterThanOrEqualTo(0.75);
-		assertThat(report.earlyCareerOnSample().recall()).as("recall on the sample").isGreaterThanOrEqualTo(0.85);
+		// first measured (2026-11-28): precision 100%, estimated recall 87.0%, recall on the sample 95.8%
+		assertThat(estimate.precision()).as("precision").isGreaterThanOrEqualTo(0.95);
+		assertThat(estimate.recall()).as("estimated recall").isGreaterThanOrEqualTo(0.80);
+		assertThat(report.earlyCareerOnSample().recall()).as("recall on the sample").isGreaterThanOrEqualTo(0.90);
 	}
 
 	@Test
 	void opportunityTypeAccuracy() {
-		assertThat(report.typeAccuracy()).isGreaterThanOrEqualTo(0.90);
-		assertThat(report.typeAccuracyOnAgreedEarlyCareer()).isGreaterThanOrEqualTo(0.90);
+		// first measured: 98.4% on all postings, 100% on postings both call early career
+		assertThat(report.typeAccuracy()).isGreaterThanOrEqualTo(0.95);
+		assertThat(report.typeAccuracyOnAgreedEarlyCareer()).isGreaterThanOrEqualTo(0.95);
 	}
 
 	@Test
 	void domainAccuracy() {
-		assertThat(report.domainAccuracy()).isGreaterThanOrEqualTo(0.80);
-		assertThat(report.domainAccuracyOnEarlyCareer()).isGreaterThanOrEqualTo(0.80);
+		// first measured: 87.3% on all postings, 85.4% on early-career postings, before the keyword changes
+		assertThat(report.domainAccuracy()).isGreaterThanOrEqualTo(0.85);
+		assertThat(report.domainAccuracyOnEarlyCareer()).isGreaterThanOrEqualTo(0.85);
 	}
 
 }

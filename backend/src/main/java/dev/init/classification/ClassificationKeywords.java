@@ -85,14 +85,16 @@ final class ClassificationKeywords {
 				"javascript", "typescript", "c++", "c#", "react", "angular", "android", "ios", "mobile", "web",
 				"cloud", "cybersecurity", "security", "soc", "penetration", "embedded", "firmware", "sysadmin",
 				"system administrator", "network engineer", "it support", "it specialist", "it administrator",
-				"it operations", "it engineer", "it consultant", "it security", "sap"));
+				"it operations", "it engineer", "it consultant", "it security", "sap", "s4hana", "4hana",
+				"information technology", "production it", "platform engineer"));
 		domains.put(Domain.DATA, List.of("data", "analytics", "data analyst", "data scientist", "data science",
 				"data engineer", "machine learning", "ml", "ai", "artificial intelligence", "business intelligence",
-				"bi", "big data", "statistics", "statistician"));
+				"bi", "big data", "statistics", "statistician", "reporting specialist", "digitalization",
+				"digitalisation", "digitalizare"));
 		domains.put(Domain.ENGINEERING, List.of("mechanical", "electrical", "electronics", "electronic", "hardware",
 				"civil", "automotive", "manufacturing", "production", "process engineer", "quality engineer",
-				"mechatronics", "mecanic", "mecanica", "electric", "electronica", "constructii", "structural", "hvac",
-				"chemical", "aerospace", "industrial", "maintenance", "mentenanta"));
+				"mechatronics", "mecanic", "mecanica", "electric", "electronica", "constructii", "construction",
+				"structural", "hvac", "chemical", "aerospace", "industrial", "maintenance", "mentenanta"));
 		domains.put(Domain.DESIGN, List.of("designer", "web designer", "ux", "ui", "user experience", "user interface",
 				"graphic design", "product design", "visual design", "interaction design", "motion design",
 				"illustrator"));
@@ -107,13 +109,15 @@ final class ClassificationKeywords {
 		domains.put(Domain.SALES, List.of("sales", "account executive", "business development", "bdr", "sdr",
 				"sales development", "account manager", "vanzari", "vanzator", "key account"));
 		domains.put(Domain.HR, List.of("hr", "human resources", "recruiter", "recruitment", "recrutare",
-				"talent acquisition", "people operations", "resurse umane", "learning and development"));
+				"talent acquisition", "people operations", "resurse umane", "learning and development",
+				"training specialist", "trainer"));
 		domains.put(Domain.LEGAL, List.of("legal", "lawyer", "counsel", "jurist", "avocat", "paralegal",
 				"compliance", "juridic", "notar"));
 		domains.put(Domain.OPERATIONS, List.of("operations", "supply chain", "logistics", "logistica",
 				"procurement", "purchasing", "achizitii", "buyer", "warehouse", "depozit", "planner", "planning",
-				"inventory", "claims", "project management", "project coordinator", "administrative",
-				"administrativ", "back office"));
+				"inventory", "claims", "project management", "project manager", "project coordinator", "pmo",
+				"program manager", "programme manager", "administrative", "administrativ", "back office", "facility",
+				"facilities", "transport", "cleaning"));
 		domains.put(Domain.CUSTOMER_SUPPORT, List.of("customer support", "customer service", "customer care",
 				"technical support", "support specialist", "support engineer", "call center", "help desk",
 				"helpdesk", "customer success", "client service", "relatii clienti"));
