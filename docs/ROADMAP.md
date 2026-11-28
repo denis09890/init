@@ -36,8 +36,8 @@ frontend.
       (`scripts/check-ats-sources.ps1`)
 - [x] Ashby and Personio connectors; Workable and Recruitee on hold
       ([ADR 0006](adr/0006-ashby-and-personio-connectors.md))
-- [ ] Manually labeled evaluation set and accuracy report for the rule-based classifier, then a
-      measured improvement of the rules
+- [x] Manually labeled evaluation set and accuracy report for the rule-based classifier, then a
+      measured improvement of the rules ([EVALUATION.md](EVALUATION.md))
 - [ ] Cross-source deduplication (canonical URL + title similarity with `pg_trgm`)
 - [ ] Skills extraction
 - [ ] LLM-based classifier behind `PostingClassifier` (structured output, caching by content hash,

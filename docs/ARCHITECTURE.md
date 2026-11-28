@@ -196,8 +196,13 @@ with the vocabulary in `ClassificationKeywords`:
 Matching ignores case and diacritics and compares whole words, so `practica` matches `Practică` and
 `intern` does not match `internal`.
 
-Every posting is stored; the public API returns only early-career ones by default. Milestone 2 adds
-an LLM-based implementation behind the same interface, with the rules as fallback.
+A description that asks for at most one year of experience, with no larger number of years anywhere,
+also marks a junior role.
+
+Every posting is stored; the public API returns only early-career ones by default. The classifier is
+measured against a hand-labelled sample of real postings ([EVALUATION.md](EVALUATION.md)): a test
+reports precision, recall and accuracy and fails when they drop below a floor. An LLM-based
+implementation can be added behind the same interface and measured on the same set.
 
 ## Data model
 
@@ -273,6 +278,7 @@ Indexes support the feed filters: `(is_early_career, location_eligible, status, 
 | `GET /api/postings/{id}` | One posting (open or closed) with a link to the original. |
 | `GET /api/companies` | Active companies with their open and early-career posting counts. |
 | `POST /api/admin/ingestion/run` | Manual ingestion trigger, `dev` profile only; returns when every source is done. |
+| `GET /api/admin/evaluation/sample` | Sample of stored postings for labelling, `dev` profile only ([EVALUATION.md](EVALUATION.md)). |
 | `GET /actuator/health` | Health check. |
 
 **`GET /api/postings` parameters** (all optional):
