@@ -32,12 +32,17 @@ frontend.
 
 ## Milestone 2 — Intelligence
 
+- [x] More companies: the catalog grew from 3 to 15 verified companies, with a lookup script
+      (`scripts/check-ats-sources.ps1`)
+- [x] Ashby and Personio connectors; Workable and Recruitee on hold
+      ([ADR 0006](adr/0006-ashby-and-personio-connectors.md))
 - [ ] Manually labeled evaluation set and accuracy report for the rule-based classifier, then a
       measured improvement of the rules
 - [ ] Cross-source deduplication (canonical URL + title similarity with `pg_trgm`)
 - [ ] Skills extraction
 - [ ] LLM-based classifier behind `PostingClassifier` (structured output, caching by content hash,
       fallback to rules), measured against the same evaluation set
+- [ ] Public read-only deployment with a link (moved ahead of Milestone 3: it needs no accounts)
 
 ## Milestone 3 — Users
 
@@ -46,7 +51,6 @@ frontend.
 - [ ] Saved searches and email alerts (outbox pattern)
 - [ ] Application tracker (Saved → Applied → Interview → Offer)
 - [ ] Deadline calendar and "Hiring now" section
-- [ ] Cloud deployment with a public link
 
 ## Milestone 4 — Growth
 
@@ -54,5 +58,6 @@ frontend.
 - [ ] Company pages with hiring history
 - [ ] Public market insights (most requested skills per field and city, trends)
 - [ ] Manual submissions with admin review
-- [ ] More connectors: Ashby, Workable, Recruitee, Personio
+- [ ] More connectors where a documented public source exists (Workable and Recruitee are on hold,
+      see ADR 0006)
 - [ ] Source health monitoring and alerting

@@ -97,6 +97,11 @@ public interface JobSourceConnector {
 | Lever | `api.lever.co/v0/postings/{site}?mode=json` (EU: `api.eu.lever.co`) | Paged with `skip`/`limit`. `workplaceType` documented as `on-site`, returned as `onsite`; both accepted. |
 | SmartRecruiters | `api.smartrecruiters.com/v1/companies/{id}/postings?country=ro` | Paged with `offset`/`limit` (max 100) until `totalFound`. The list has no description, so each posting's details are fetched and stored as the raw payload. |
 | JSON-LD | the career page URL | robots.txt checked first. Reads `<script type="application/ld+json">` blocks, including `@graph`; skips broken blocks; does not follow links. |
+| Ashby | `api.ashbyhq.com/posting-api/job-board/{board}` | One response, no paging. Unlisted jobs (`isListed: false`) are skipped. The country is a name, so only Romania is mapped to `RO`; secondary locations are kept (a remote role lists the countries it is open to). |
+| Personio | `{company}.jobs.personio.de/xml` | One XML document, read as bytes so its declared encoding wins, parsed with the JDK with DTDs refused (no XXE). Each position is stored as JSON with the same element names. The feed has no link per position, so `jobUrl` is built from the documented pattern `/job/{id}`. The company must be a single DNS label, since it becomes a host name. |
+
+Workable and Recruitee were considered and left out for now; the reasons are in
+[ADR 0006](adr/0006-ashby-and-personio-connectors.md).
 
 All HTTP goes through `SourceHttpClient` (JDK `HttpClient` behind Spring `RestClient`), which sets the
 `InitBot` User-Agent and timeouts (`init.http.*`) and turns failures into `SourceFetchException`
@@ -104,7 +109,8 @@ with the HTTP status and whether a retry makes sense (I/O errors, 429, 5xx). It 
 per-host rate limit and the retries described under *Resilience*.
 
 Connector tests run against recorded API responses in `src/test/resources/fixtures/`, trimmed to a
-few postings with descriptions replaced, so the repository never republishes job descriptions.
+few postings with descriptions replaced, so the repository never republishes job descriptions. The
+Ashby and Personio fixtures follow the live format for a fictional company.
 
 ### Ingestion flow
 
@@ -211,7 +217,7 @@ erDiagram
 **companies**: `id`, `name`, `slug` (unique), `website`, `active`, `created_at`, `updated_at`.
 
 **company_sources**: `id`, `company_id`, `source_type` (`GREENHOUSE`, `LEVER`, `SMARTRECRUITERS`,
-`JSON_LD`), `identifier` (board token, company id or page URL), `region` (`GLOBAL`, `EU`: Lever serves
+`ASHBY`, `PERSONIO`, `JSON_LD`), `identifier` (board token, company id, board name, subdomain or page URL), `region` (`GLOBAL`, `EU`: Lever serves
 EU customers from a separate API host), `active`, `created_at`. Unique on `(source_type, identifier)`.
 
 **raw_postings**: `id`, `company_source_id`, `external_id`, `payload` (`jsonb`), `payload_hash`,
@@ -356,9 +362,13 @@ the live public API, and the first entries, added before the catalog grew, are m
 
 Board identifiers are never guessed into the catalog. `scripts/check-ats-sources.ps1` reads the
 company names in `scripts/ats-candidates.txt`, tries the usual identifiers on the public Greenhouse,
-Lever and SmartRecruiters APIs (sequentially, with a pause between requests and the `InitBot`
+Lever, SmartRecruiters, Ashby and Personio APIs (sequentially, with a pause between requests and the `InitBot`
 User-Agent) and reports every board that exists: the board name returned by the API, how many
 postings are located in Romania and how many of their titles look early-career. A person then checks
 that each board really belongs to the company (a token such as `remote` or `wise` can belong to
 somebody else) and adds only those to `companies.yml`. The script reads public APIs only and changes
 nothing; it can be run again at any time to see whether a company has started publishing in Romania.
+
+Guessing identifiers from names finds few boards, so the most reliable way is to open the company's
+own careers page and read the board identifier from its links (for example
+`jobs.ashbyhq.com/uipath`); that is how Nagarro, UiPath and n8n were added.

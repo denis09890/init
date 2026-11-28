@@ -11,5 +11,8 @@ Responses of the public job-board APIs, used by the connector tests.
   items) were simplified.
 - `jsonld/` contains a hand-written career page following the schema.org `JobPosting` vocabulary,
   for a fictional company on the reserved `example.com` domain.
+- `ashby/` and `personio/` were written by hand on 2026-11-28 for a fictional company named `example`,
+  following the field names, nesting and value formats of the live Ashby API and Personio feed
+  checked that day (including an unlisted Ashby job and an older Personio date format).
 
 To refresh a fixture, record the endpoint again, then trim it the same way.

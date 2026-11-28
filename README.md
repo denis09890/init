@@ -23,10 +23,10 @@ early-career ones, and tracking when they open and close.
 
 ## Features
 
-Implemented in Milestone 1:
+Implemented so far:
 
-- Automated ingestion from public ATS job-board APIs (Greenhouse, Lever, SmartRecruiters) and from
-  schema.org `JobPosting` structured data on career pages
+- Automated ingestion from public ATS job-board APIs (Greenhouse, Lever, SmartRecruiters, Ashby) and
+  feeds (Personio), and from schema.org `JobPosting` structured data on career pages
 - Detection of new, updated and closed postings, with a full history of every ingestion run
 - Rule-based early-career classification in English and Romanian (opportunity type, domain, location)
 - Search API with filters, pagination and full-text search
@@ -50,6 +50,8 @@ flowchart LR
         GH[Greenhouse API]
         LV[Lever API]
         SR[SmartRecruiters API]
+        AS[Ashby API]
+        PE[Personio XML feed]
         LD[Career pages<br/>schema.org JSON-LD]
     end
 
@@ -64,7 +66,7 @@ flowchart LR
     DB[(PostgreSQL)]
     FE[React frontend]
 
-    GH & LV & SR & LD --> ING
+    GH & LV & SR & AS & PE & LD --> ING
     ING --> RAW --> NORM --> CLS --> DB
     DB --> API --> FE
 ```
@@ -95,7 +97,7 @@ Ground rules:
 | Backend | Java 21, Spring Boot, Maven wrapper |
 | Persistence | PostgreSQL, Flyway, Spring Data JPA |
 | HTTP and concurrency | Spring `RestClient`, virtual threads |
-| Parsing | jsoup (JSON-LD extraction from HTML) |
+| Parsing | jsoup (JSON-LD extraction from HTML), the JDK XML parser (Personio feeds) |
 | Testing | JUnit 5, AssertJ, Mockito, Testcontainers |
 | Frontend | React, TypeScript, Vite, React Router, Tailwind CSS |
 | Infrastructure | Docker Compose, GitHub Actions |
@@ -187,8 +189,8 @@ npm run build
 | Milestone | Scope | Status |
 |---|---|---|
 | 1. Foundation | Ingestion pipeline, connectors, rule-based classifier, search API, minimal UI, CI | Complete |
-| 2. Intelligence | Classifier evaluation set, cross-source deduplication, skills extraction, LLM classification | Planned |
-| 3. Users | Accounts, profiles, match score, alerts, application tracker, cloud deploy | Planned |
+| 2. Intelligence | More companies and connectors, classifier evaluation set, cross-source deduplication, skills extraction, LLM classification, public deployment | In progress |
+| 3. Users | Accounts, profiles, match score, alerts, application tracker | Planned |
 | 4. Growth | Telegram bot, company pages, market insights, manual submissions, more connectors | Planned |
 
 Full breakdown in [docs/ROADMAP.md](docs/ROADMAP.md).
