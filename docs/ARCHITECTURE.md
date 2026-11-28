@@ -213,8 +213,17 @@ also marks a junior role.
 
 Every posting is stored; the public API returns only early-career ones by default. The classifier is
 measured against a hand-labelled sample of real postings ([EVALUATION.md](EVALUATION.md)): a test
-reports precision, recall and accuracy and fails when they drop below a floor. An LLM-based
-implementation can be added behind the same interface and measured on the same set.
+reports precision, recall and accuracy and fails when they drop below a floor.
+
+**LLM second pass** ([ADR 0007](adr/0007-llm-classifier.md)), off by default. When `LLM_ENABLED=true`
+and `GROQ_API_KEY` are set, `LlmReclassifier` runs every 3 hours, apart from the ingestion: it reads the
+full description of a few postings the feed can show again from their raw payloads, and asks
+`LlmClassifier` (Groq's chat completions API, model `openai/gpt-oss-20b`, a strict JSON schema whose
+enums are Init's categories) for early career, opportunity type, domain and seniority. Location,
+language and pay stay with the rules. `llm_content_hash` caches the verdict by content: an unchanged
+posting is never sent again. Any failure keeps the rules' verdict. `POST /api/admin/llm/run` starts a
+pass by hand in the dev profile. The classification package itself stays free of I/O; the LLM client
+lives in `classification.llm`.
 
 ### Skills
 
@@ -275,6 +284,7 @@ stored once, not on every run.
 | `search_vector` | generated `tsvector` over title and snippet, GIN index |
 | `duplicate_of_id` | the earlier posting this one repeats, or null; duplicates are left out of the feed |
 | `skills` | `text[]` of skill names from the extractor's vocabulary, GIN index |
+| `llm_content_hash` | the `content_hash` the LLM classifier last judged; equal means the classification is the LLM's |
 
 Full-text search uses the `simple` text-search configuration, because postings are a mix of English and
 Romanian and a language-specific stemmer would mangle the other language. `simple` does not remove
@@ -304,6 +314,7 @@ Indexes support the feed filters: `(is_early_career, location_eligible, status, 
 | `GET /api/companies` | Active companies with their open and early-career posting counts. |
 | `POST /api/admin/ingestion/run` | Manual ingestion trigger, `dev` profile only; returns when every source is done. |
 | `GET /api/admin/evaluation/sample` | Sample of stored postings for labelling, `dev` profile only ([EVALUATION.md](EVALUATION.md)). |
+| `POST /api/admin/llm/run?limit=10` | One LLM classification pass, `dev` profile only; does nothing unless the LLM is enabled. |
 | `GET /actuator/health` | Health check. |
 
 **`GET /api/postings` parameters** (all optional):

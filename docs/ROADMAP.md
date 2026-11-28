@@ -40,8 +40,9 @@ frontend.
       measured improvement of the rules ([EVALUATION.md](EVALUATION.md))
 - [x] Cross-source deduplication (same link, or title similarity with `pg_trgm` and a shared location)
 - [x] Skills extraction (fixed vocabulary, shown on the posting page)
-- [ ] LLM-based classifier behind `PostingClassifier` (structured output, caching by content hash,
-      fallback to rules), measured against the same evaluation set
+- [x] LLM-based classifier (Groq, strict structured output, caching by content hash, fallback to
+      rules; [ADR 0007](adr/0007-llm-classifier.md)); off by default
+- [ ] Measure the LLM classifier against the same evaluation set (needs an API key)
 - [ ] Public read-only deployment with a link (moved ahead of Milestone 3: it needs no accounts)
 
 ## Milestone 3 — Users

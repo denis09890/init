@@ -30,6 +30,8 @@ Implemented so far:
 - Detection of new, updated and closed postings, with a full history of every ingestion run
 - Duplicate detection: a role a company publishes twice (or on two platforms) appears once
 - Skills extraction: the technologies, tools and languages a posting asks for
+- Optional LLM second pass (Groq, strict JSON schema) that refines the rules' classification,
+  cached by content and measured on the same labelled set
 - Rule-based early-career classification in English and Romanian (opportunity type, domain, location),
   measured against a hand-labelled sample of real postings: 100% precision, 95.8% recall on the
   sample ([evaluation](docs/EVALUATION.md))
