@@ -80,6 +80,7 @@ public class PostingSearchRepository {
 			List<String> conditions = new ArrayList<>();
 			Map<String, Object> params = new HashMap<>();
 			conditions.add("p.status = 'OPEN'");
+			conditions.add("p.duplicate_of_id is null");
 			if (request.earlyCareerOnly()) {
 				conditions.add("p.is_early_career");
 			}
