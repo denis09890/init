@@ -146,6 +146,7 @@ class RuleBasedClassifierTests {
 				minim 2 ani de experiență                  | 2
 				experiență de minim 4 ani                  | 4
 				experience of at least 6 years             | 6
+				1-3 years of experience                    | 1
 				founded in 2026, a team of 40 people       | -1
 				""")
 		void readsRequiredYearsOfExperience(String description, int expected) {
@@ -202,6 +203,39 @@ class RuleBasedClassifierTests {
 		}
 
 		@Test
+		void descriptionAskingForAtMostOneYearIsJunior() {
+			Classification result = classifier.classify(job("Mobile Application Developer")
+				.description("Requirements: 1+ years of experience developing mobile applications on Android or iOS.")
+				.build());
+
+			assertThat(result.earlyCareer()).isTrue();
+			assertThat(result.opportunityType()).isEqualTo(OpportunityType.JUNIOR);
+			assertThat(result.seniority()).isEqualTo(Seniority.ENTRY);
+			assertThat(result.reasons()).contains("JUNIOR: description says 'at most 1 year of experience'");
+		}
+
+		@Test
+		void aLargerRequirementElsewhereIsNotJunior() {
+			Classification result = classifier.classify(job("Backend Developer")
+				.description("At least 1 year of experience with Docker and 3 years of experience in Java.")
+				.build());
+
+			assertThat(result.earlyCareer()).isFalse();
+		}
+
+		@ParameterizedTest(name = "\"{0}\" -> early career: {1}")
+		@CsvSource(delimiter = '|', textBlock = """
+				0-1 years of experience in testing   | true
+				1-3 years of experience in testing   | false
+				2 years of experience in testing     | false
+				""")
+		void aRangeIsJuniorOnlyIfItsUpperBoundIsLow(String description, boolean earlyCareer) {
+			Classification result = classifier.classify(job("QA Engineer").description(description).build());
+
+			assertThat(result.earlyCareer()).isEqualTo(earlyCareer);
+		}
+
+		@Test
 		void neutralPostingIsNotEarlyCareer() {
 			Classification result = classifier.classify(job("Software Developer").description("Build APIs.").build());
 
@@ -232,9 +266,33 @@ class RuleBasedClassifierTests {
 				Sales Development Representative          | SALES
 				Social Media Intern                       | MARKETING
 				Dentist                                   | OTHER
+				Working Student for Transport & Cleaning  | OPERATIONS
+				Project Manager Officer                   | OPERATIONS
+				Technical Program Manager                 | OPERATIONS
+				Microsoft 365 Platform Engineer           | SOFTWARE
+				S/4HANA Key User                          | SOFTWARE
+				Reporting Specialist                      | DATA
+				Working Student - Digitalization Team     | DATA
+				Training Specialist - Tires               | HR
+				PI Construction Engineer - Tires          | ENGINEERING
 				""")
 		void domainFromTitle(String title, Domain domain) {
 			assertThat(classifier.classify(job(title).build()).domain()).isEqualTo(domain);
+		}
+
+		/** Found by the evaluation: the department name alone pointed elsewhere. */
+		@Test
+		void titleOutweighsAMisleadingDepartment() {
+			assertThat(classifier.classify(job("Working Student for Transport & Cleaning").department("Customer Service")
+				.build()).domain()).isEqualTo(Domain.OPERATIONS);
+			assertThat(classifier.classify(job("Senior Microsoft 365 Platform Engineer").department("Customer Service")
+				.build()).domain()).isEqualTo(Domain.SOFTWARE);
+		}
+
+		@Test
+		void informationTechnologyDepartmentCountsAsSoftware() {
+			assertThat(classifier.classify(job("Working Student Production IT").department("Information Technology")
+				.build()).domain()).isEqualTo(Domain.SOFTWARE);
 		}
 
 		@Test

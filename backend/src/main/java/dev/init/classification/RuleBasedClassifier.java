@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 import dev.init.source.NormalizedJob;
 import dev.init.source.RemoteType;
@@ -39,9 +40,15 @@ public class RuleBasedClassifier implements PostingClassifier {
 	/** Applied to {@link MatchText#normalize normalized} text: lower case, no diacritics, no punctuation but '+'. */
 	private static final String YEARS = "(?:years?|yrs|ani)\\b";
 
-	/** "3+ years of experience", "3-5 years experience" (normalized to "3 5"), "minim 2 ani de experienta". */
+	/** A description that asks for at most this many years of experience describes a junior role. */
+	static final int MAX_JUNIOR_SIGNAL_YEARS = 1;
+
+	/**
+	 * "3+ years of experience", "3-5 years experience" (normalized to "3 5"; group 2 is the upper
+	 * bound), "minim 2 ani de experienta".
+	 */
 	private static final Pattern YEARS_THEN_EXPERIENCE = Pattern.compile(
-			"\\b(\\d{1,2})(?:\\s(?:to\\s|si\\s|la\\s)?\\d{1,2})?\\s*\\+?\\s*" + YEARS
+			"\\b(\\d{1,2})(?:\\s(?:to\\s|si\\s|la\\s)?(\\d{1,2}))?\\s*\\+?\\s*" + YEARS
 					+ "\\s(?:\\S+\\s){0,4}?(?:experience|experienta)");
 
 	/** "experience of at least 3 years", "experienta de minim 3 ani". */
@@ -57,7 +64,7 @@ public class RuleBasedClassifier implements PostingClassifier {
 		MatchText hints = MatchText.of(job.employmentType(), job.experienceLevel());
 		MatchText description = MatchText.of(job.description());
 
-		TypeEvidence evidence = opportunityType(title, hints, description);
+		TypeEvidence evidence = opportunityType(title, hints, description, job.description());
 		evidence.reason().ifPresent(reasons::add);
 
 		Seniority excludedAs = exclusion(job, title, evidence, reasons);
@@ -76,13 +83,30 @@ public class RuleBasedClassifier implements PostingClassifier {
 
 	// ----- Opportunity type ---------------------------------------------------------------------
 
-	private TypeEvidence opportunityType(MatchText title, MatchText hints, MatchText description) {
+	private TypeEvidence opportunityType(MatchText title, MatchText hints, MatchText description,
+			String rawDescription) {
 		return firstMatch(title, Strength.TITLE, INTERNSHIP, WORKING_STUDENT, GRADUATE_PROGRAM, JUNIOR)
 			.or(() -> firstMatch(hints, Strength.HINT, INTERNSHIP_HINTS, WORKING_STUDENT_HINTS, GRADUATE_HINTS,
 					JUNIOR_HINTS))
 			.or(() -> firstMatch(description, Strength.DESCRIPTION, INTERNSHIP_DESCRIPTION,
 					WORKING_STUDENT_DESCRIPTION, GRADUATE_DESCRIPTION, JUNIOR_DESCRIPTION))
+			.or(() -> littleExperienceAsked(rawDescription))
 			.orElse(TypeEvidence.NONE);
+	}
+
+	/**
+	 * "1+ years of experience" with no larger number of years anywhere in the description. Every
+	 * mention counts, upper bounds of ranges included, so "1 year with Docker, 3 years with Java" or
+	 * "1-3 years" are not taken as junior.
+	 */
+	private static Optional<TypeEvidence> littleExperienceAsked(String description) {
+		OptionalInt most = yearsMentioned(description).max();
+		if (most.isEmpty() || most.getAsInt() > MAX_JUNIOR_SIGNAL_YEARS) {
+			return Optional.empty();
+		}
+		int years = most.getAsInt();
+		return Optional.of(new TypeEvidence(OpportunityType.JUNIOR, Strength.DESCRIPTION,
+				"at most " + years + (years == 1 ? " year" : " years") + " of experience"));
 	}
 
 	/** Lists in the order internship, working student, graduate program, junior. */
@@ -143,15 +167,23 @@ public class RuleBasedClassifier implements PostingClassifier {
 
 	/** The smallest number of years of experience the description asks for, if any. */
 	static OptionalInt requiredYears(String description) {
+		return yearsMentioned(description).min();
+	}
+
+	/** Every number of years of experience the description mentions, both ends of a range included. */
+	private static IntStream yearsMentioned(String description) {
 		String text = MatchText.normalize(description == null ? "" : description);
-		int min = Integer.MAX_VALUE;
+		IntStream.Builder years = IntStream.builder();
 		for (Pattern pattern : List.of(YEARS_THEN_EXPERIENCE, EXPERIENCE_THEN_YEARS)) {
 			Matcher matcher = pattern.matcher(text);
 			while (matcher.find()) {
-				min = Math.min(min, Integer.parseInt(matcher.group(1)));
+				years.add(Integer.parseInt(matcher.group(1)));
+				if (matcher.groupCount() >= 2 && matcher.group(2) != null) {
+					years.add(Integer.parseInt(matcher.group(2)));
+				}
 			}
 		}
-		return min == Integer.MAX_VALUE ? OptionalInt.empty() : OptionalInt.of(min);
+		return years.build();
 	}
 
 	private static Seniority seniorityOf(TypeEvidence evidence) {
