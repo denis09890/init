@@ -1,0 +1,182 @@
+# Companies to look up with scripts/check-ats-sources.ps1.
+#
+# A name here is NOT an endorsement and NOT a verified identifier: the script only tries usual board
+# identifiers derived from the name on the public ATS APIs, and a person checks every hit before it
+# goes into backend/src/main/resources/companies.yml.
+#
+# Format: "Name", or "Name = token1, token2" to try specific identifiers as well.
+# ASCII only. Lines starting with # are comments.
+
+# --- Product, SaaS and security companies with engineering in Romania ---
+UiPath
+Betfair
+Veeam
+Avast
+Gen Digital
+McAfee
+Trend Micro
+ESET
+Elastic
+GitLab
+Canonical
+Automattic
+Mozilla
+Doctolib
+Deel
+Remote
+Toptal
+Celonis
+Personio
+SumUp
+Paysafe
+Payoneer
+Revolut
+N26
+Wise
+Adyen
+Mambu
+Contentful
+Typeform
+Miro
+Pipedrive
+Stripe
+Datadog
+Cloudflare
+MongoDB
+Okta
+Twilio
+HubSpot
+Atlassian
+JFrog
+Snyk
+Qlik
+Showpad
+Visma
+Lightspeed
+Wolt
+Bolt
+Glovo
+Playtika
+Gameloft
+Ubisoft
+Electronic Arts
+Keywords Studios
+Yopeso
+Fintech OS
+Druid AI
+Clever Cloud
+Zonky
+Hootsuite
+
+# --- IT services and consulting with Romanian offices ---
+Endava
+Accesa
+Fortech
+Nagarro
+Thoughtworks
+Pentalog
+Grid Dynamics
+Softvision
+Crossover
+Luxoft
+Globant
+Cegeka
+Tremend
+Evozon
+Zitec
+Qubiz
+3Pillar Global
+Genpact
+EPAM
+Cognizant
+Capgemini
+Accenture
+Deloitte
+Sii
+Ness
+Betsson
+Kambi
+
+# --- Business services and shared-service centres ---
+Concentrix
+Teleperformance
+Telus International
+Conduent
+Atento
+Webhelp
+Foundever
+Majorel
+WNS
+EXL
+Sitel
+Alorica
+Xerox
+Cargill
+Mondelez
+Unilever
+
+# --- Industry, automotive and electronics ---
+Continental
+Siemens
+Schaeffler
+Vitesco
+Hella
+ZF
+Draexlmaier
+Kostal
+Marquardt
+Preh
+Autoliv
+Valeo
+Michelin
+Infineon
+NXP
+Garrett Motion
+Honeywell
+Emerson
+ABB
+Schneider Electric
+Legrand
+Husqvarna
+Electrolux
+Liebherr
+Mahle
+Hitachi
+Zebra Technologies
+Wabtec
+Delphi
+Aptiv
+
+# --- Banking, insurance and finance ---
+Raiffeisen
+ING
+UniCredit
+Garanti
+Allianz
+Generali
+Visa
+Mastercard
+Citi
+Bloomberg
+Nielsen
+Ipsos
+GfK
+
+# --- Retail, telecom and others ---
+Kaufland
+Lidl
+Carrefour
+Orange
+Vodafone
+Telekom
+Digi
+Philip Morris
+Heineken
+Coca-Cola HBC
+Ikea
+Decathlon
+Sanofi
+Pfizer
+Novartis
+Roche
+Medtronic
