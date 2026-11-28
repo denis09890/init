@@ -25,6 +25,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -34,6 +35,9 @@ import org.hibernate.type.SqlTypes;
  */
 @Entity
 @Table(name = "postings")
+// only changed columns are written: the LLM pass updates the classification columns with plain SQL,
+// and an ingestion that only marks a posting as seen must not write back the values it read earlier
+@DynamicUpdate
 public class Posting {
 
 	public static final int SNIPPET_MAX_LENGTH = 300;
