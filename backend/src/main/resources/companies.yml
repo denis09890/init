@@ -8,8 +8,9 @@
 #   scripts/check-ats-sources.ps1, and a person checks that the board really belongs to the company.
 # - `example: true` marks the first entries, added as verified examples before the catalog grew.
 #
-# Source fields: type (GREENHOUSE | LEVER | SMARTRECRUITERS | JSON_LD), identifier (board token,
-# company id or career page URL), region (GLOBAL | EU, default GLOBAL; Lever only).
+# Source fields: type (GREENHOUSE | LEVER | SMARTRECRUITERS | ASHBY | PERSONIO | JSON_LD), identifier
+# (board token, company id, Ashby board name, Personio subdomain or career page URL), region
+# (GLOBAL | EU, default GLOBAL; Lever only).
 init:
   catalog:
     companies:
@@ -105,3 +106,27 @@ init:
         sources:
           - type: GREENHOUSE
             identifier: showpad
+
+      # Verified 2026-11-28: the identifier comes from a link on the company's own careers page, and the
+      # public API answered with postings in Romania (Nagarro: 14 with country "ro"; UiPath: Bucharest
+      # roles; n8n: remote roles that list Romania among their locations).
+      - name: Nagarro
+        slug: nagarro
+        website: https://www.nagarro.com
+        sources:
+          - type: SMARTRECRUITERS
+            identifier: Nagarro1
+
+      - name: UiPath
+        slug: uipath
+        website: https://www.uipath.com
+        sources:
+          - type: ASHBY
+            identifier: uipath
+
+      - name: n8n
+        slug: n8n
+        website: https://n8n.io
+        sources:
+          - type: ASHBY
+            identifier: n8n
