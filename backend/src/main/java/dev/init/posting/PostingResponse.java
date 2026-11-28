@@ -15,6 +15,7 @@ import dev.init.source.RemoteType;
  * @param url the original posting on the company's own site or ATS
  * @param snippet the start of the description, at most {@value Posting#SNIPPET_MAX_LENGTH} characters
  * @param paid {@code null} when the posting does not say
+ * @param skills skills the posting mentions, from a fixed vocabulary
  */
 public record PostingResponse(
 		Long id,
@@ -35,10 +36,12 @@ public record PostingResponse(
 		Domain domain,
 		Seniority seniority,
 		String language,
-		Boolean paid) {
+		Boolean paid,
+		List<String> skills) {
 
 	public PostingResponse {
 		locations = List.copyOf(locations);
+		skills = skills == null ? List.of() : List.copyOf(skills);
 	}
 
 	public record CompanyRef(String name, String slug) {

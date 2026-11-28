@@ -87,6 +87,24 @@ class PostingSynchronizerTests {
 	}
 
 	@Test
+	void storesTheSkillsThePostingMentions() {
+		sync(T0, job("a", "Junior Java Developer", "Build REST APIs with Spring Boot and SQL. Good English."));
+
+		assertThat(reload("a").getSkills()).containsExactly("Java", "SQL", "Spring", "REST APIs", "English");
+	}
+
+	@Test
+	void fillsInSkillsOfUnchangedPostingsOnTheNextRun() {
+		sync(T0, job("a", "Junior Java Developer", "Build APIs."));
+		jdbcClearSkills();
+
+		SyncResult result = sync(T1, job("a", "Junior Java Developer", "Build APIs."));
+
+		assertThat(result).as("not counted as an update").isEqualTo(new SyncResult(0, 0, 0));
+		assertThat(reload("a").getSkills()).containsExactly("Java");
+	}
+
+	@Test
 	void storesLocationEligibilityOfPostingsOutsideRomania() {
 		sync(T0, job("a", "Software Engineer Intern", "Join us.", List.of("Toronto, Canada"), "CA"));
 
@@ -199,6 +217,13 @@ class PostingSynchronizerTests {
 
 	private SyncResult sync(Instant now, IngestedJob... jobs) {
 		return synchronizer.synchronize(source.getId(), new SourceBatch(List.of(jobs), Set.of()), now);
+	}
+
+	/** Like a posting stored before skills existed. */
+	private void jdbcClearSkills() {
+		entityManager.flush();
+		entityManager.createNativeQuery("update postings set skills = '{}'").executeUpdate();
+		entityManager.clear();
 	}
 
 	/** Entities are cleared first so what is read is what the database holds. */

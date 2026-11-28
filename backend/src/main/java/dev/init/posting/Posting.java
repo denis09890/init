@@ -112,6 +112,10 @@ public class Posting {
 	@Column(length = 8)
 	private String language;
 
+	@JdbcTypeCode(SqlTypes.ARRAY)
+	@Column(nullable = false)
+	private List<String> skills = new ArrayList<>();
+
 	private Boolean paid;
 
 	@Column(nullable = false, updatable = false)
@@ -159,6 +163,14 @@ public class Posting {
 		this.seniority = classification.seniority();
 		this.language = classification.language();
 		this.paid = classification.paid();
+	}
+
+	/** The skills the posting mentions, in the extractor's order. */
+	public void applySkills(List<String> skills) {
+		List<String> copy = List.copyOf(Objects.requireNonNull(skills, "skills"));
+		if (!copy.equals(this.skills)) {
+			this.skills = new ArrayList<>(copy);
+		}
 	}
 
 	/**
@@ -296,6 +308,10 @@ public class Posting {
 
 	public String getLanguage() {
 		return language;
+	}
+
+	public List<String> getSkills() {
+		return List.copyOf(skills);
 	}
 
 	public Boolean getPaid() {

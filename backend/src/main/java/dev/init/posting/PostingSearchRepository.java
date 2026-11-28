@@ -32,7 +32,7 @@ public class PostingSearchRepository {
 			select p.id, p.title, c.name as company_name, c.slug as company_slug, p.url, p.locations,
 			       p.remote_type, p.snippet, p.posted_at, p.first_seen_at, p.last_seen_at, p.closed_at, p.status,
 			       p.is_early_career, p.location_eligible, p.opportunity_type, p.domain, p.seniority, p.language,
-			       p.paid
+			       p.paid, p.skills
 			from postings p
 			join companies c on c.id = p.company_id
 			""";
@@ -157,7 +157,8 @@ public class PostingSearchRepository {
 				Domain.valueOf(rs.getString("domain")),
 				Seniority.valueOf(rs.getString("seniority")),
 				rs.getString("language"),
-				rs.getObject("paid", Boolean.class));
+				rs.getObject("paid", Boolean.class),
+				List.of((String[]) rs.getArray("skills").getArray()));
 	}
 
 	private static Instant instant(ResultSet rs, String column) throws SQLException {
