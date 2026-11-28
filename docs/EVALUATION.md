@@ -80,7 +80,20 @@ What the errors show:
   "trainer" (HR); "project manager", "program manager", "PMO", "facility", "transport", "cleaning"
   (operations). Each one comes from an error above and has a unit test.
 
-The new scores are in the report the build writes. The floors in the test only go up.
+Second measurement, same day, after these changes:
+
+| Metric | Before | After |
+|---|---|---|
+| Early career: precision | 100.0% | 100.0% |
+| Early career: recall on the sample / estimated | 95.8% / 87.0% | 95.8% / 87.0% |
+| Opportunity type, all postings | 98.4% | 98.4% |
+| Domain, all postings | 87.3% | **96.8%** |
+| Domain, early-career postings | 85.4% | **95.8%** |
+
+The domain errors that remain are two manufacturing "digitalization" roles, one labelled software and
+one data, where the title alone cannot tell. Early career does not change on this set: the new
+one-year rule needs the full description, which the test does not have (see Limitations). The floors
+in the test were raised to just under the new values; they only go up.
 
 ## Limitations
 

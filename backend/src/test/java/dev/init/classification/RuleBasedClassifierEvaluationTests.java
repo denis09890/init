@@ -51,9 +51,9 @@ class RuleBasedClassifierEvaluationTests {
 
 	@Test
 	void domainAccuracy() {
-		// first measured: 87.3% on all postings, 85.4% on early-career postings, before the keyword changes
-		assertThat(report.domainAccuracy()).isGreaterThanOrEqualTo(0.85);
-		assertThat(report.domainAccuracyOnEarlyCareer()).isGreaterThanOrEqualTo(0.85);
+		// 87.3% / 85.4% before the keyword changes, 96.8% / 95.8% after (2026-11-28)
+		assertThat(report.domainAccuracy()).isGreaterThanOrEqualTo(0.93);
+		assertThat(report.domainAccuracyOnEarlyCareer()).isGreaterThanOrEqualTo(0.93);
 	}
 
 }
