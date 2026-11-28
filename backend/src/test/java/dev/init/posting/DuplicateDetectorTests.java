@@ -151,12 +151,16 @@ class DuplicateDetectorTests {
 		entityManager.flush();
 	}
 
+	/** The id of the posting this one repeats, or null; a single row is read, as the value may be null. */
 	private Long duplicateOf(String externalId) {
-		return jdbc.sql("select duplicate_of_id from postings where company_source_id = :source and external_id = :id")
+		Object value = jdbc
+			.sql("select duplicate_of_id from postings where company_source_id = :source and external_id = :id")
 			.param("source", acme.getId())
 			.param("id", externalId)
-			.query(Long.class)
-			.single();
+			.query()
+			.singleRow()
+			.get("duplicate_of_id");
+		return value == null ? null : ((Number) value).longValue();
 	}
 
 	private long id(String externalId) {
