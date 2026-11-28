@@ -1,7 +1,7 @@
 # Architecture
 
 This document describes how Init is built and why. Decisions with long-term impact are recorded as
-[ADRs](adr/). The data model below is the target for Milestone 1; it is refined as the code lands.
+[ADRs](adr/). It describes the system as of Milestone 1.
 
 ## Overview
 

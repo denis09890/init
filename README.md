@@ -3,7 +3,7 @@
 > **Init your career.** Early-career opportunities in Romania, aggregated in one place.
 
 [![CI](https://github.com/denis09890/init/actions/workflows/ci.yml/badge.svg)](https://github.com/denis09890/init/actions/workflows/ci.yml)
-![Status](https://img.shields.io/badge/status-Milestone%201%20in%20progress-yellow)
+![Status](https://img.shields.io/badge/status-Milestone%201%20complete-brightgreen)
 
 Init collects internships, summer practice, working-student roles, graduate and trainee programs and
 junior positions from public company sources, classifies them, and makes them searchable in a single feed.
@@ -23,7 +23,7 @@ early-career ones, and tracking when they open and close.
 
 ## Features
 
-Implemented in Milestone 1 (in progress):
+Implemented in Milestone 1:
 
 - Automated ingestion from public ATS job-board APIs (Greenhouse, Lever, SmartRecruiters) and from
   schema.org `JobPosting` structured data on career pages
@@ -102,9 +102,6 @@ Ground rules:
 
 ## Running locally
 
-> These instructions are being built up during Milestone 1 and will be verified on a fresh clone
-> before the milestone is closed.
-
 **Prerequisites:** JDK 21 or newer, Node.js 24 (22.18 or newer also works: the frontend tests run
 TypeScript directly with Node), Docker Desktop (or any Docker engine with Compose).
 
@@ -138,8 +135,11 @@ sources, paced politely). Then try the API:
 # Open early-career postings in Romania, newest first
 Invoke-RestMethod "http://localhost:8080/api/postings?size=5" | ConvertTo-Json -Depth 5
 
-# Search (diacritics are ignored) and filter
-Invoke-RestMethod "http://localhost:8080/api/postings?q=practica&city=timisoara&type=WORKING_STUDENT"
+# Full-text search (case and diacritics are ignored)
+Invoke-RestMethod "http://localhost:8080/api/postings?q=student"
+
+# Filter by city and type ("timisoara" also finds "Timișoara")
+Invoke-RestMethod "http://localhost:8080/api/postings?city=timisoara&type=WORKING_STUDENT"
 
 # Companies with their posting counts
 Invoke-RestMethod "http://localhost:8080/api/companies"
@@ -147,6 +147,11 @@ Invoke-RestMethod "http://localhost:8080/api/companies"
 # Start an ingestion by hand (dev profile only)
 Invoke-RestMethod -Method Post "http://localhost:8080/api/admin/ingestion/run"
 ```
+
+The results depend on what the companies publish at the moment, so the numbers change over time.
+Windows PowerShell 5.1 reads the API's UTF-8 JSON as Latin-1, so accented letters (`ș`, `ț`) look
+garbled in the output of `Invoke-RestMethod`; PowerShell 7 shows them correctly, and the web UI is not
+affected.
 
 The filters are listed in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#rest-api-milestone-1).
 
@@ -181,8 +186,8 @@ npm run build
 
 | Milestone | Scope | Status |
 |---|---|---|
-| 1. Foundation | Ingestion pipeline, connectors, rule-based classifier, search API, minimal UI, CI | In progress |
-| 2. Intelligence | LLM classification, evaluation set, cross-source deduplication, skills extraction | Planned |
+| 1. Foundation | Ingestion pipeline, connectors, rule-based classifier, search API, minimal UI, CI | Complete |
+| 2. Intelligence | Classifier evaluation set, cross-source deduplication, skills extraction, LLM classification | Planned |
 | 3. Users | Accounts, profiles, match score, alerts, application tracker, cloud deploy | Planned |
 | 4. Growth | Telegram bot, company pages, market insights, manual submissions, more connectors | Planned |
 
