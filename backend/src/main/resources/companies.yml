@@ -4,8 +4,9 @@
 #
 # Rules (see docs/adr/0002-data-sources-and-legal-stance.md):
 # - Every identifier must be verified against the live public API before it is added.
-# - Never guess board tokens or company ids.
-# - `example: true` marks entries added as verified examples, pending the owner's curated list.
+# - Never guess board tokens or company ids. Candidates are looked up with
+#   scripts/check-ats-sources.ps1, and a person checks that the board really belongs to the company.
+# - `example: true` marks the first entries, added as verified examples before the catalog grew.
 #
 # Source fields: type (GREENHOUSE | LEVER | SMARTRECRUITERS | JSON_LD), identifier (board token,
 # company id or career page URL), region (GLOBAL | EU, default GLOBAL; Lever only).
@@ -38,3 +39,69 @@ init:
         sources:
           - type: SMARTRECRUITERS
             identifier: BoschGroup
+
+      # Verified 2026-11-28 with scripts/check-ats-sources.ps1: the board name returned by each API is
+      # the company's own, and each had postings located in Romania. SmartRecruiters identifiers are
+      # case-insensitive (`Endava` and `endava` return the same board).
+      - name: Endava
+        slug: endava
+        website: https://www.endava.com
+        sources:
+          - type: SMARTRECRUITERS
+            identifier: Endava
+
+      - name: Continental
+        slug: continental
+        website: https://www.continental.com
+        sources:
+          - type: SMARTRECRUITERS
+            identifier: Continental
+
+      - name: Accesa
+        slug: accesa
+        website: https://www.accesa.eu
+        sources:
+          - type: SMARTRECRUITERS
+            identifier: Accesa
+
+      - name: Gameloft
+        slug: gameloft
+        website: https://www.gameloft.com
+        sources:
+          - type: SMARTRECRUITERS
+            identifier: Gameloft
+
+      - name: Stripe
+        slug: stripe
+        website: https://stripe.com
+        sources:
+          - type: GREENHOUSE
+            identifier: stripe
+
+      - name: Elastic
+        slug: elastic
+        website: https://www.elastic.co
+        sources:
+          - type: GREENHOUSE
+            identifier: elastic
+
+      - name: Hootsuite
+        slug: hootsuite
+        website: https://www.hootsuite.com
+        sources:
+          - type: GREENHOUSE
+            identifier: hootsuite
+
+      - name: Wolt
+        slug: wolt
+        website: https://wolt.com
+        sources:
+          - type: GREENHOUSE
+            identifier: wolt
+
+      - name: Showpad
+        slug: showpad
+        website: https://www.showpad.com
+        sources:
+          - type: GREENHOUSE
+            identifier: showpad

@@ -121,15 +121,17 @@ class CompanyCatalogSynchronizerTests {
 	}
 
 	@Test
-	void bundledCatalogContainsOnlyVerifiedExamplesAndSynchronizes() {
+	void bundledCatalogIsValidAndSynchronizes() {
 		assertThat(bundledCatalog.syncOnStartup()).as("disabled in the test profile").isFalse();
 		assertThat(bundledCatalog.companies()).extracting(CompanyDefinition::slug)
-			.containsExactlyInAnyOrder("bitdefender", "cresta", "bosch");
-		assertThat(bundledCatalog.companies()).allMatch(CompanyDefinition::example);
+			.contains("bitdefender", "cresta", "bosch");
+		assertThat(bundledCatalog.companies()).extracting(CompanyDefinition::slug).doesNotHaveDuplicates();
+		int companyCount = bundledCatalog.companies().size();
+		int sourceCount = bundledCatalog.companies().stream().mapToInt(company -> company.sources().size()).sum();
 
 		CatalogSyncResult result = synchronizer.synchronize(bundledCatalog.companies());
 
-		assertThat(result).isEqualTo(new CatalogSyncResult(3, 0, 0, 3, 0, 0));
+		assertThat(result).isEqualTo(new CatalogSyncResult(companyCount, 0, 0, sourceCount, 0, 0));
 		assertThat(sources.findBySourceTypeAndIdentifier(SourceType.SMARTRECRUITERS, "BoschGroup")).isPresent();
 	}
 
